@@ -3,10 +3,10 @@ from pathlib import Path
 from datetime import datetime, date, time
 from dateutil.parser import parse
 
-DEFAULT_DATA_FILE_NAME = "notes.csv"
+DEFAULT_DATABASE_FILE_NAME = "notes.csv"
 DEFAULT_PATH_TO_DATA_BASE = os.getcwd()
 
-data_file_name = os.path.join(DEFAULT_PATH_TO_DATA_BASE, DEFAULT_DATA_FILE_NAME)
+data_file_name = os.path.join(DEFAULT_PATH_TO_DATA_BASE, DEFAULT_DATABASE_FILE_NAME)
 print(type(data_file_name))
 print(data_file_name)
 

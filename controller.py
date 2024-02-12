@@ -1,6 +1,6 @@
 from global_data import *
 import view
-import db_connect
+import csv_db_connect
 
 def run() : 
     view.out(HELLO_MESSAGE)
