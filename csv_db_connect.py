@@ -6,9 +6,11 @@ from dateutil.parser import parse
 DEFAULT_DATABASE_FILE_NAME = "notes.csv"
 DEFAULT_PATH_TO_DATA_BASE = os.getcwd()
 
-data_file_name = os.path.join(DEFAULT_PATH_TO_DATA_BASE, DEFAULT_DATABASE_FILE_NAME)
-print(type(data_file_name))
-print(data_file_name)
+FULL_DEFAULT_DATABASE_FILE_NAME = os.path.join(DEFAULT_PATH_TO_DATA_BASE, DEFAULT_DATABASE_FILE_NAME)
+print(type(FULL_DEFAULT_DATABASE_FILE_NAME))
+print(FULL_DEFAULT_DATABASE_FILE_NAME)
+
+
 
 # Метод db_file_exists проверяет переданную в него строку на то, является ли она корректным 
 # полным именем существующего файла
@@ -59,36 +61,38 @@ def write_data_to_csv_file (name_of_file, list_of_list_of_strings) :
         dest.write()
 
 
-# Метод проверяет, представляет ли собой поданная ему на вход структура список списков из 4-х строк: 
-def if_read_data_are_notes (data) :
-    if type(data) == list : 
-        # состоит ли данный список из списков: 
-        result = True
-        for elem in data : 
-            result = result and type(elem) == list and len(elem) == 4
-            if result == False : 
-                return result
-            else : 
-                for field in elem : 
-                    result = result and type(field) == str
-                if result == False : 
-                    return result
-                else : 
-                    date_time = parse(elem[0])
-                    result = elem[0].isdigit() and elem[3][:10].is
-        return result
-    else : 
-        return False
+# Метод проверяет, представляет ли собой поданная ему на вход структура списком списков из 4-х строк: 
+# def if_read_data_are_notes (data) :
+#     if type(data) == list : 
+#         # состоит ли данный список из списков: 
+#         result = True
+#         for elem in data : 
+#             result = result and type(elem) == list and len(elem) == 4
+#             if result == False : 
+#                 return result
+#             else : 
+#                 for field in elem : 
+#                     result = result and type(field) == str
+#                 if result == False : 
+#                     return result
+#                 else : 
+#                     date_time = parse(elem[0])
+#                     result = elem[0].isdigit() and elem[3][:10].
+#         return result
+#     else : 
+#         return False
 
-print(db_file_exists(data_file_name))
+print(f"Файл с именем {data_file_name} существует." if db_file_exists(data_file_name) else f"Файла с именем {data_file_name} не существует.")
+print("А существует ли файл C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.t ?" , end = " - " )
 print(db_file_exists("C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.txt"))
 print()
+print("А является ли файл C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION\Konkurs.csv csv-файлом?" , end = " - " )
 print(db_file_is_csv(Path("Konkurs.csv")))
 
 read_file_result = read_data_from_csv_file (data_file_name)
 print(type(read_file_result))
 
-print(f"Является ли содержимое файла заметками? - {if_read_data_are_notes(read_file_result)}")
+# print(f"Является ли содержимое файла заметками? - {if_read_data_are_notes(read_file_result)}")
 
 # print("Konkurs.csv"[-4:])
 # data = open(data_file_name, 'r', encoding = 'utf-8')
