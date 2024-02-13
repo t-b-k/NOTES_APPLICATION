@@ -37,9 +37,6 @@ print(datetime.today())
 print(date.now())
 print(DEFAULT_PATH_TO_DATA_BASE)
 
-
-
-
 print("Текущая директория:", os.getcwd())
 print(os.path.exists(os.getcwd()))
 print(os.path.exists(Path("C:\\Users\\Татьяна Калашникова\\CODE")))
