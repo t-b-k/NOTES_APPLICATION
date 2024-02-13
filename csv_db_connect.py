@@ -20,7 +20,7 @@ def db_init() :
         default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, "использовать файл по умолчанию", "использовать другой файл")
         if default_or_other == 2 : 
             user_input = view.in_string("Введите имя файла, с которым хотите работать: ")
-            if os.path.exists(user_input) and os.isfile(user_input) : 
+            if os.path.exists(user_input) and os.path.isfile(user_input) : 
                 data_base_name = user_input
             else : 
                 view.out("Файла с таким именем не существует. Программа завершает работу...")
