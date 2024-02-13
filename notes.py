@@ -4,7 +4,6 @@ import controller
 from global_data import *
 
 def main() : 
-
     controller.run()
 
 main()

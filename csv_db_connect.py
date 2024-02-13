@@ -2,15 +2,53 @@ import os
 from pathlib import Path
 from datetime import datetime, date, time
 from dateutil.parser import parse
+from global_data import *
+import view
 
-DEFAULT_DATABASE_FILE_NAME = "notes.csv"
-DEFAULT_PATH_TO_DATA_BASE = os.getcwd()
+# DEFAULT_DATABASE_FILE_NAME = "notes.csv"
+# DEFAULT_PATH_TO_DATA_BASE = os.getcwd()
 
-FULL_DEFAULT_DATABASE_FILE_NAME = os.path.join(DEFAULT_PATH_TO_DATA_BASE, DEFAULT_DATABASE_FILE_NAME)
-print(type(FULL_DEFAULT_DATABASE_FILE_NAME))
-print(FULL_DEFAULT_DATABASE_FILE_NAME)
+# FULL_DEFAULT_DATABASE_FILE_NAME = os.path.join(DEFAULT_PATH_TO_DATA_BASE, DEFAULT_DATABASE_FILE_NAME)
+# print(type(FULL_DEFAULT_DATABASE_FILE_NAME))
+# print(FULL_DEFAULT_DATABASE_FILE_NAME)
 
-
+def db_init() : 
+    global data_base_name
+    new_or_existing = view.choice_of_two("Вы будете работать с уже существующим .csv-файлом заметок или хотите создать новый?", 
+                       "работать с уже существующим", "создать новый")
+    if new_or_existing == 1 : 
+        default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, "использовать файл по умолчанию", "использовать другой файл")
+        if default_or_other == 2 : 
+            user_input = view.in_string("Введите имя файла, с которым хотите работать: ")
+            if os.path.exists(user_input) and os.isfile(user_input) : 
+                data_base_name = user_input
+            else : 
+                view.out("Файла с таким именем не существует. Программа завершает работу...")
+                return False
+        elif default_or_other != 1 : 
+            view.out("Вы ввели недопустимое значение. Программа завершает работу... ")
+            return False
+    elif new_or_existing == 2 : 
+        user_choice = view.choice_of_two("Файл с заметками следует создать в текущем каталоге? ", "Да", "Нет")
+        if user_choice == 2 : 
+            db_path_name = view.in_string(f"Введите путь к каталогу, в котором хотите создать файл или Enter.\nПо умолчанию будет использоваться"+
+                                   " каталог: {DEFAULT_PATH_TO_DATA_BASE}")
+            if db_path_name == "" : 
+                db_path_name = DEFAULT_PATH_TO_DATA_BASE
+            elif not os.path.exists(Path(db_path_name)) or not os.path.isdir(Path(db_path_name)): 
+                view.out("Каталога с таким именем не существует. Программа завершает работу...")
+                return False
+            db_file_name = os.path.join(view.in_string("Введите имя нового файла без расширения. Ему будет присвоено расширение .csv: "), 
+                                        ".csv")
+            data_base_name = os.path.join(db_path_name, db_file_name)
+        else : 
+            view.out("Вы дали недопустимый ответ. Программа завершает работу... ")
+            return False
+    else : 
+        view.out("Вы ввели недопустимое значение. Программа завершает работу... ")
+        return False
+    view.out("БД заметок с именем {} готова к работе.".format())
+    return True
 
 # Метод db_file_exists проверяет переданную в него строку на то, является ли она корректным 
 # полным именем существующего файла
@@ -44,7 +82,7 @@ print(str(date_and_time)[:16]) # Дата + время без секунд и м
 # Предполагается, что .csv-файл не содержит заголовков, то есть в возвращаемой структуре 
 # "голые" данные
 def read_data_from_csv_file (name_of_existing_csv_file) : 
-    data = open(data_file_name, 'r', encoding = 'utf-8')
+    data = open(name_of_existing_csv_file, 'r', encoding = 'utf-8')
     list_of_lists_of_strings = [[*string.split(sep=";")[0:]] for string in data.readlines()]
     data.close()
     return list_of_lists_of_strings
@@ -82,14 +120,14 @@ def write_data_to_csv_file (name_of_file, list_of_list_of_strings) :
 #     else : 
 #         return False
 
-print(f"Файл с именем {data_file_name} существует." if db_file_exists(data_file_name) else f"Файла с именем {data_file_name} не существует.")
+print(f"Файл с именем {data_base_name} существует." if db_file_exists(data_base_name) else f"Файла с именем {data_base_name} не существует.")
 print("А существует ли файл C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.t ?" , end = " - " )
 print(db_file_exists("C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.txt"))
 print()
 print("А является ли файл C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION\Konkurs.csv csv-файлом?" , end = " - " )
 print(db_file_is_csv(Path("Konkurs.csv")))
 
-read_file_result = read_data_from_csv_file (data_file_name)
+read_file_result = read_data_from_csv_file (data_base_name)
 print(type(read_file_result))
 
 # print(f"Является ли содержимое файла заметками? - {if_read_data_are_notes(read_file_result)}")
