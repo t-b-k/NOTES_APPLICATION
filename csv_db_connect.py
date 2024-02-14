@@ -6,6 +6,7 @@ from global_data import *
 import view
 import model
 from model import int_db_structure
+from csv_db_connect import *
 
 # DEFAULT_DATABASE_FILE_NAME = "notes.csv"
 # DEFAULT_PATH_TO_DATA_BASE = os.getcwd()
@@ -20,6 +21,10 @@ DEFAULT_DB_NAME_MESSAGE = """По умолчанию используется ф
 
 DEFAULT_PATH_TO_DATA_BASE = Path(os.getcwd())
 DEFAULT_DATA_FILE_NAME = "notes.csv"
+
+data_base_name = str(DEFAULT_PATH_TO_DATA_BASE.joinpath(DEFAULT_DATA_FILE_NAME))
+print(data_base_name)
+print(type(str(data_base_name)))
 
 """ Метод db_init() возвращает: 
         Номер следующего доступного к использованию ID - если файл заметок существует и не пуст

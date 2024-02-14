@@ -47,18 +47,14 @@ MAX_NUMBER_OF_ATTEMPTS = 3
 
 print(datetime.today())
 print(date.today())
-print(DEFAULT_PATH_TO_DATA_BASE)
-print(type(DEFAULT_PATH_TO_DATA_BASE))
+# print(DEFAULT_PATH_TO_DATA_BASE)
+# print(type(DEFAULT_PATH_TO_DATA_BASE))
 
 print("Текущая директория:", os.getcwd())
 print(os.path.exists(os.getcwd()))
 print(os.path.exists(Path("C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION")))
 print(os.path.isdir(Path("C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION\\notes.csv")))
 print(os.path.isfile(Path("C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION\\notes.csv")))
-
-data_base_name = str(DEFAULT_PATH_TO_DATA_BASE.joinpath(DEFAULT_DATA_FILE_NAME))
-print(data_base_name)
-print(type(str(data_base_name)))
 
 """Для хранения заметок в процессе работы с программой используется список, элементами которого являются заметки. 
    Каждая заметка - это список из 4-х элементов: 
