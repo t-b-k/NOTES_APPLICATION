@@ -4,6 +4,8 @@ from datetime import datetime, date, time
 from dateutil.parser import parse
 from global_data import *
 import view
+import model
+from model import int_db_structure
 
 # DEFAULT_DATABASE_FILE_NAME = "notes.csv"
 # DEFAULT_PATH_TO_DATA_BASE = os.getcwd()
@@ -12,43 +14,80 @@ import view
 # print(type(FULL_DEFAULT_DATABASE_FILE_NAME))
 # print(FULL_DEFAULT_DATABASE_FILE_NAME)
 
+# Расположение базы данных заметок, используемое по умолчанию
+
+DEFAULT_DB_NAME_MESSAGE = """По умолчанию используется файл notes.csv из текущей директории"""
+
+DEFAULT_PATH_TO_DATA_BASE = Path(os.getcwd())
+DEFAULT_DATA_FILE_NAME = "notes.csv"
+
+""" Метод db_init() возвращает: 
+        Номер следующего доступного к использованию ID - если файл заметок существует и не пуст
+        0 - если файл заметок пуст или вновь создан
+       -1 - если файла не существует или с ним что-то не так."""
+
 def db_init() : 
-    global data_base_name
+    global data_base_name, next_ID
     new_or_existing = view.choice_of_two("Вы будете работать с уже существующим .csv-файлом заметок или хотите создать новый?", 
-                       "работать с уже существующим", "создать новый")
+                       "1 - работать с уже существующим", "2 - создать новый")
+    
+    # Если будем работать с существующим файлом: 
     if new_or_existing == 1 : 
-        default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, "использовать файл по умолчанию", "использовать другой файл")
+        default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, "1 - использовать файл по умолчанию", "2 - использовать другой файл")
+
+        # Если пользователь хочет указать свой файл: 
         if default_or_other == 2 : 
-            user_input = view.in_string("Введите имя файла, с которым хотите работать: ")
+            user_input = view.string_input("\nВведите полное имя файла, с которым хотите работать: ")
+            # !!!!!!!!!!!!!! Добавить проверку на расширение файла !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if os.path.exists(user_input) and os.path.isfile(user_input) : 
                 data_base_name = user_input
             else : 
-                view.out("Файла с таким именем не существует. Программа завершает работу...")
-                return False
+                view.out("\nФайла с таким именем не существует. Программа завершает работу...")
+                return -1
+        # Если пользователь ввел недопустимое значение: 
         elif default_or_other != 1 : 
-            view.out("Вы ввели недопустимое значение. Программа завершает работу... ")
-            return False
+            view.out("\nВы ввели недопустимое значение. Программа завершает работу... ")
+            return -1
+        # В противном случае будет использоваться файл по умолчанию. 
+    
+    # Если пользователь хочет создать новый файл базы заметок: 
     elif new_or_existing == 2 : 
-        user_choice = view.choice_of_two("Файл с заметками следует создать в текущем каталоге? ", "Да", "Нет")
-        if user_choice == 2 : 
-            db_path_name = view.in_string(f"Введите путь к каталогу, в котором хотите создать файл или Enter.\nПо умолчанию будет использоваться"+
-                                   " каталог: {DEFAULT_PATH_TO_DATA_BASE}")
+        user_choice = view.choice_of_two("\nФайл с заметками следует создать в текущем каталоге? ", "1 - Да", "2 - Нет")
+        if user_choice != 1 and user_choice != 2 : 
+            view.out("\nВы дали недопустимый ответ. Программа завершает работу... ")
+            return -1
+        # Если хочет создать новый файл в каталоге, отличном от текущего рабочего: 
+        elif  user_choice == 2 :
+            db_path_name = view.string_input("Введите путь к каталогу, в котором хотите создать файл или Enter.\nПо умолчанию будет использоваться"+
+                                   f" каталог: {DEFAULT_PATH_TO_DATA_BASE}\n ===> ")
             if db_path_name == "" : 
                 db_path_name = DEFAULT_PATH_TO_DATA_BASE
             elif not os.path.exists(Path(db_path_name)) or not os.path.isdir(Path(db_path_name)): 
-                view.out("Каталога с таким именем не существует. Программа завершает работу...")
-                return False
-            db_file_name = os.path.join(view.in_string("Введите имя нового файла без расширения. Ему будет присвоено расширение .csv: "), 
-                                        ".csv")
-            data_base_name = os.path.join(db_path_name, db_file_name)
+                view.out("\nКаталога с таким именем не существует. Программа завершает работу...")
+                return -1
         else : 
-            view.out("Вы дали недопустимый ответ. Программа завершает работу... ")
-            return False
+            db_path_name = DEFAULT_PATH_TO_DATA_BASE
+            print(f"\nФайл для заметок будет создан в каталоге {DEFAULT_PATH_TO_DATA_BASE}")
+
+        db_file_name = view.string_input("\nВведите имя нового файла заметок без расширения.\n"+
+                                                   "Расширение .csv будет присвоено ему автоматически: \n ===> ")
+        db_file_name = db_file_name + ".csv"
+        data_base_name = os.path.join(db_path_name, db_file_name)
+        if os.path.exists(Path(data_base_name)) : 
+            view.out("\nВы ввели имя существующего файла. Программа завершает работу... ")
+            return -1
+        else : 
+            with open(data_base_name, "x", encoding = "utf-8") as db: 
+                return 0
     else : 
-        view.out("Вы ввели недопустимое значение. Программа завершает работу... ")
-        return False
-    view.out("БД заметок с именем {} готова к работе.".format(data_base_name))
-    return True
+        view.out("\nВы ввели недопустимое значение. Программа завершает работу... ")
+        return -1
+    view.out("\nБД заметок с именем {} готова к работе...\n".format(data_base_name))
+    stat_result = os.stat(data_base_name)
+    if stat_result.st_size == 0 : 
+        return 0
+    else : 
+        return 1
 
 # Метод db_file_exists проверяет переданную в него строку на то, является ли она корректным 
 # полным именем существующего файла
@@ -81,7 +120,7 @@ print(str(date_and_time)[:16]) # Дата + время без секунд и м
 # список списков, в котором каждый элемент вложенного списка является строкой. 
 # Предполагается, что .csv-файл не содержит заголовков, то есть в возвращаемой структуре 
 # "голые" данные
-def read_data_from_csv_file (name_of_existing_csv_file) : 
+def get_data (name_of_existing_csv_file) : 
     data = open(name_of_existing_csv_file, 'r', encoding = 'utf-8')
     list_of_lists_of_strings = [[*string.split(sep=";")[0:]] for string in data.readlines()]
     data.close()
@@ -127,7 +166,7 @@ print()
 print("А является ли файл C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION\Konkurs.csv csv-файлом?" , end = " - " )
 print(db_file_is_csv(Path("Konkurs.csv")))
 
-read_file_result = read_data_from_csv_file (data_base_name)
+read_file_result = get_data (data_base_name)
 print(type(read_file_result))
 
 # print(f"Является ли содержимое файла заметками? - {if_read_data_are_notes(read_file_result)}")

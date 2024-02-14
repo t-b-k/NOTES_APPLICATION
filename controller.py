@@ -1,14 +1,55 @@
-from global_data import *
+from datetime import datetime, date, time
+from model import int_db_structure
 import view
+import model
+from global_data import *
 from csv_db_connect import *
 
+READING_ERROR = "ОШИБКА ЧТЕНИЯ ДАННЫХ"
+
 def run() : 
+    global int_db_structure, next_ID
     view.out(HELLO_MESSAGE)
+    onward = True
+    notes_exist = db_init()
+    if notes_exist == -1: 
+        onward = False
+    elif notes_exist == 1 : 
+        int_db_structure = model.read_data_from_csv(data_base_name)
+        if len(int_db_structure) == 0 : 
+            print(READING_ERROR)
+        else : 
+            print("Ваши заметки: \n")
+            print(int_db_structure)
     
-    db_init()
-    onward = False
+    # Файл с заметками определен
+    view.out(MAIN_MENU)
     while onward : 
-        view.out(MAIN_MENU)
+         action = view.string_input("  ===> ")
+         match action :
+             case 'm': 
+                 view.out(COMMANDS_LIST)
+             case 'l': 
+                 print("Ваши заметки: \n")
+                 print(int_db_structure)
+             case 'a': 
+                 onward = False
+                 add_note()
+                 view.show_note(int_db_structure[-1])
+    #         case 'f': 
+    #             onward = False
+    #         case 'e': 
+    #             onward = False
+    #         case 'd': 
+    #             onward = False
+    #         case 'c': 
+    #             onward = False
+    #         case 's': 
+    #             onward = False
+    #         case 'q': 
+    #             onward = False
+             case _ : 
+                view.out("Недопустимая команда. Попробуйте еще раз.")
 
 # def db_init() : 
 #     global data_base_name
@@ -47,6 +88,19 @@ def run() :
 #         return False
 #     view.out("БД заметок с именем {} готова к работе.".format(data_base_name))
 #     return True
+                
+def add_note() : 
+    global next_ID, int_db_structure
+    view.out(f"ID новой заметки будет равен {next_ID}")
+    int_db_structure.append([next_ID].append(view.string_input(NOTE_NAME_INVIT)).
+                            append(view.string_input(NOTE_BODY_INVIT)).
+                            append(datetime.now()))
+    next_ID += 1
+
+
+
+
+
     
 
     
