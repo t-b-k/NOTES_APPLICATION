@@ -14,7 +14,7 @@ int_db_structure = []
 next_ID = 1
 
 def read_data_from_csv (csv_file_name) : 
-    global int_db_structure
+    global int_db_structure, next_ID
     empty_list = []
     data = open(csv_file_name, 'r', encoding = 'utf-8')
     list_of_notes = [[*string.split(sep=";")[0:]] for string in data.readlines()]
@@ -34,6 +34,7 @@ def read_data_from_csv (csv_file_name) :
         print(NOT_UNIQUE_IDS_ERROR)
         return empty_list
     data.close()
+    next_ID = get_next_ID (list_of_notes)
     return list_of_notes
 
 def all_IDs_are_diferent(list_of_notes) : 
@@ -44,9 +45,12 @@ def get_next_ID (list_of_notes) :
     return max([note[0] for note in list_of_notes]) + 1
 
 def add_note(header, text) : 
-    int_db_structure.append([next_ID].append(header).
-                            append(text).
-                            append(datetime.now()))
+    global next_ID, int_db_structure
+    note = [next_ID, header, text, datetime.now()]
+    print(type(note))
+    print(f"Внутри метода add_note, перед добавлением заметки в int_db_structure ее длина равна {len(int_db_structure)}")
+    int_db_structure.append(note)
+    print(f"Внутри метода add_note, после добавления заметки в int_db_structure ее длина равна {len(int_db_structure)}")
     next_ID += 1
     return int_db_structure[-1]
 

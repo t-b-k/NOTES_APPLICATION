@@ -1,5 +1,5 @@
 from datetime import datetime, date, time
-from model import int_db_structure
+from model import int_db_structure, next_ID
 import view
 import model
 from global_data import *
@@ -9,6 +9,7 @@ READING_ERROR = "ОШИБКА ЧТЕНИЯ ДАННЫХ"
 
 def run() : 
     global int_db_structure, next_ID
+    print(f"Модуль controller.py, метод run(), next_ID = {next_ID}")
     view.out(HELLO_MESSAGE)
     onward = True
     notes_exist = db_init()
@@ -16,6 +17,7 @@ def run() :
         onward = False
     elif notes_exist == 1 : 
         int_db_structure = model.read_data_from_csv(data_base_name)
+        print(f"Количество заметок в исходном файле = {len(int_db_structure)}")
         if len(int_db_structure) == 0 : 
             print(READING_ERROR)
         else : 
@@ -34,9 +36,16 @@ def run() :
                  print(int_db_structure)
              case 'a': 
                  note_data = request_note_data()
-                 added_note = model.add_note(note_data[0], note_data[1])
-                 used_ID = added_note[0]
-                 view.out("В базу добавлена заметка c ID = {}:".format(used_ID))
+                 print(f"Type of note_data = {type(note_data)}")
+                 print(note_data[0])
+                 print(note_data[1])
+                 print(f"Длина int_db_structure = {len(int_db_structure)}")
+                 model.add_note("Таня", "Наша Таня громко плачет")
+                 print(f"Длина int_db_structure после выполнения метода add_note = {len(int_db_structure)}")
+                 print(f"Новый next_ID = {next_ID}")
+                 #print(f"Type of added_note = {type(added_note)}")
+                #  used_ID = added_note[0]
+                 view.out("В базу добавлена заметка c ID = {}:".format(next_ID-1))
                  view.out(model.note_to_string(int_db_structure[-1]))
     #         case 'f': 
     #             onward = False
