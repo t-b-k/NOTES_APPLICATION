@@ -1,22 +1,21 @@
 from datetime import datetime, date, time
-from model import int_db_structure, next_ID
 import view
 import model
-from global_data import *
-from csv_db_connect import *
+import global_data
+import csv_db_connect
 
 READING_ERROR = "ОШИБКА ЧТЕНИЯ ДАННЫХ"
 
 def run() : 
     global int_db_structure, next_ID
     print(f"Модуль controller.py, метод run(), next_ID = {next_ID}")
-    view.out(HELLO_MESSAGE)
+    view.out(global_data.HELLO_MESSAGE)
     onward = True
-    notes_exist = db_init()
+    notes_exist = csv_db_connect.db_init()
     if notes_exist == -1: 
         onward = False
     elif notes_exist == 1 : 
-        int_db_structure = model.read_data_from_csv(data_base_name)
+        int_db_structure = model.read_data_from_csv(csv_db_connect.data_base_name)
         print(f"Количество заметок в исходном файле = {len(int_db_structure)}")
         if len(int_db_structure) == 0 : 
             print(READING_ERROR)
@@ -25,7 +24,7 @@ def run() :
             print(int_db_structure)
     
     # Файл с заметками определен
-    view.out(MAIN_MENU)
+    view.out(global_data.MAIN_MENU)
     while onward : 
          action = view.string_input("  ===> ")
          match action :

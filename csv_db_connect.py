@@ -4,7 +4,7 @@ from datetime import datetime, date, time
 from dateutil.parser import parse
 from global_data import *
 import view
-import model
+from model import next_ID
 from model import int_db_structure
 from csv_db_connect import *
 
