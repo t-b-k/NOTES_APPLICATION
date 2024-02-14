@@ -1,9 +1,11 @@
-from global_data import *
 from datetime import datetime, date, time
+from tabulate import tabulate
 from dateutil.parser import parse
 
+from global_data import *
+
 TYPE_CONVERSION_ERROR = "Модуль model.py\n\tОшибка формата файла базы данных: невозможно преобразовать к нужному типу"
-NOT_UNIQUE_IDs_ERROR = "Модуль model.py\n\tОшибка формата файла базы данных: неуникальные идентификаторы заметок."
+NOT_UNIQUE_IDS_ERROR = "Модуль model.py\n\tОшибка формата файла базы данных: неуникальные идентификаторы заметок."
 WRONG_FIELDS_QTY = "Модуль model.py\n\tОшибка формата файла базы данных: неверное количество полей в заметке."
 
 # Инициализируем внутреннюю структуру для хранения заметок в процессе работы пустым списком
@@ -29,7 +31,7 @@ def read_data_from_csv (csv_file_name) :
     print("list_of_notes: ")
     print(list_of_notes)
     if not all_IDs_are_diferent(list_of_notes) : 
-        print(NOT_UNIQUE_IDs_ERROR)
+        print(NOT_UNIQUE_IDS_ERROR)
         return empty_list
     data.close()
     return list_of_notes
@@ -40,3 +42,15 @@ def all_IDs_are_diferent(list_of_notes) :
 
 def get_next_ID (list_of_notes) : 
     return max([note[0] for note in list_of_notes]) + 1
+
+def add_note(header, text) : 
+    int_db_structure.append([next_ID].append(header).
+                            append(text).
+                            append(datetime.now()))
+    next_ID += 1
+    return int_db_structure[-1]
+
+def note_to_string (note) : 
+    columns = ["ID", "Заголовок", "Текст", "Дата/время создания"]
+    print(tabulate(note, headers=columns))
+    print()

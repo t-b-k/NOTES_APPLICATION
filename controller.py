@@ -33,9 +33,11 @@ def run() :
                  print("Ваши заметки: \n")
                  print(int_db_structure)
              case 'a': 
-                 onward = False
-                 add_note()
-                 view.show_note(int_db_structure[-1])
+                 note_data = request_note_data()
+                 added_note = model.add_note(note_data[0], note_data[1])
+                 used_ID = added_note[0]
+                 view.out("В базу добавлена заметка c ID = {}:".format(used_ID))
+                 view.out(model.note_to_string(int_db_structure[-1]))
     #         case 'f': 
     #             onward = False
     #         case 'e': 
@@ -46,10 +48,13 @@ def run() :
     #             onward = False
     #         case 's': 
     #             onward = False
-    #         case 'q': 
-    #             onward = False
+             case 'q': 
+                onward = False
              case _ : 
                 view.out("Недопустимая команда. Попробуйте еще раз.")
+
+def request_note_data() : 
+    return view.string_input(NOTE_NAME_INVIT), view.string_input(NOTE_BODY_INVIT)
 
 # def db_init() : 
 #     global data_base_name
@@ -89,13 +94,7 @@ def run() :
 #     view.out("БД заметок с именем {} готова к работе.".format(data_base_name))
 #     return True
                 
-def add_note() : 
-    global next_ID, int_db_structure
-    view.out(f"ID новой заметки будет равен {next_ID}")
-    int_db_structure.append([next_ID].append(view.string_input(NOTE_NAME_INVIT)).
-                            append(view.string_input(NOTE_BODY_INVIT)).
-                            append(datetime.now()))
-    next_ID += 1
+
 
 
 
