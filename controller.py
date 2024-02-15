@@ -1,7 +1,7 @@
 from datetime import datetime, date, time
 import view
 import model
-import global_data
+from global_data import *
 import csv_db_connect
 
 READING_ERROR = "ОШИБКА ЧТЕНИЯ ДАННЫХ"
@@ -10,13 +10,18 @@ def run() :
     global int_db_structure
     global next_ID
     print(f"Модуль controller.py, метод run(), next_ID = {next_ID}")
-    view.out(global_data.HELLO_MESSAGE)
+    print(f"Модуль controller.py, метод run(), string 13. int_db_structure = \n{int_db_structure}\n")
+    view.out(HELLO_MESSAGE)
     onward = True
     notes_exist = csv_db_connect.db_init()
     if notes_exist == -1: 
         onward = False
     elif notes_exist == 1 : 
         int_db_structure = model.read_data_from_csv(csv_db_connect.data_base_name)
+        next_ID = model.get_next_ID(int_db_structure)
+        print("Считали данные из файла с заметками. ")
+        print(f"Модуль controller.py, метод run(), string 22. int_db_structure = \n{int_db_structure}\n")
+        print(f"Модуль controller.py, метод run(), string 23. next_ID = {next_ID}")
         print(f"Количество заметок в исходном файле = {len(int_db_structure)}")
         if len(int_db_structure) == 0 : 
             print(READING_ERROR)
@@ -25,7 +30,7 @@ def run() :
             print(int_db_structure)
     
     # Файл с заметками определен
-    view.out(global_data.MAIN_MENU)
+    view.out(MAIN_MENU)
     while onward : 
          action = view.string_input("  ===> ")
          match action :
@@ -40,13 +45,15 @@ def run() :
                  print(note_data[0])
                  print(note_data[1])
                  print(f"Длина int_db_structure = {len(int_db_structure)}")
-                 model.add_note("Таня", "Наша Таня громко плачет")
+                 model.add_note(int_db_structure, next_ID, "Таня", "Наша Таня громко плачет")
+                 next_ID = model.get_next_ID(int_db_structure)
                  print(f"Длина int_db_structure после выполнения метода add_note = {len(int_db_structure)}")
                  print(f"Новый next_ID = {next_ID}")
                  #print(f"Type of added_note = {type(added_note)}")
                 #  used_ID = added_note[0]
                  view.out("В базу добавлена заметка c ID = {}:".format(next_ID-1))
                  view.out(model.note_to_string(int_db_structure[-1]))
+                 print(int_db_structure)
     #         case 'f': 
     #             onward = False
     #         case 'e': 

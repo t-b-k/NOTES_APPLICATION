@@ -34,7 +34,7 @@ def read_data_from_csv (csv_file_name) :
         print(NOT_UNIQUE_IDS_ERROR)
         return empty_list
     data.close()
-    next_ID = get_next_ID (list_of_notes)
+    # next_ID = get_next_ID(list_of_notes)
     return list_of_notes
 
 def all_IDs_are_diferent(list_of_notes) : 
@@ -44,17 +44,19 @@ def all_IDs_are_diferent(list_of_notes) :
 def get_next_ID (list_of_notes) : 
     return max([note[0] for note in list_of_notes]) + 1
 
-def add_note(header, text) : 
-    global next_ID, int_db_structure
+def add_note(list_of_notes, next_ID, header, text) : 
+    # global next_ID, int_db_structure
     note = [next_ID, header, text, datetime.now()]
     print(type(note))
-    print(f"Внутри метода add_note, перед добавлением заметки в int_db_structure ее длина равна {len(int_db_structure)}")
-    int_db_structure.append(note)
-    print(f"Внутри метода add_note, после добавления заметки в int_db_structure ее длина равна {len(int_db_structure)}")
-    next_ID += 1
-    return int_db_structure[-1]
+    print(f"Внутри метода add_note, перед добавлением заметки в list_of_notes ее длина равна {len(list_of_notes)}")
+    list_of_notes.append(note)
+    print(f"Внутри метода add_note, после добавления заметки в list_of_notes ее длина равна {len(list_of_notes)}")
+    # next_ID += 1
+    return list_of_notes[-1]
 
 def note_to_string (note) : 
     columns = ["ID", "Заголовок", "Текст", "Дата/время создания"]
-    print(tabulate(note, headers=columns))
-    print()
+    printable_note = [str(note[0]), note[1], note[2], note[3].strftime("%D-%m-%Y %H:%M:%S")]
+    # print(tabulate(printable_note, headers=columns))
+    # print()
+    return printable_note
