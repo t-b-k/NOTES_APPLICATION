@@ -2,11 +2,9 @@ import os
 from pathlib import Path
 from datetime import datetime, date, time
 from dateutil.parser import parse
-from global_data import *
+
+import global_data
 import view
-from model import next_ID
-from model import int_db_structure
-from csv_db_connect import *
 
 # DEFAULT_DATABASE_FILE_NAME = "notes.csv"
 # DEFAULT_PATH_TO_DATA_BASE = os.getcwd()
@@ -22,9 +20,9 @@ DEFAULT_DB_NAME_MESSAGE = """По умолчанию используется ф
 DEFAULT_PATH_TO_DATA_BASE = Path(os.getcwd())
 DEFAULT_DATA_FILE_NAME = "notes.csv"
 
-data_base_name = str(DEFAULT_PATH_TO_DATA_BASE.joinpath(DEFAULT_DATA_FILE_NAME))
-print(data_base_name)
-print(type(str(data_base_name)))
+global_data.data_base_name = str(DEFAULT_PATH_TO_DATA_BASE.joinpath(DEFAULT_DATA_FILE_NAME))
+print(global_data.data_base_name)
+print(type(str(global_data.data_base_name)))
 
 """ Метод db_init() возвращает: 
         Номер следующего доступного к использованию ID - если файл заметок существует и не пуст
@@ -32,7 +30,6 @@ print(type(str(data_base_name)))
        -1 - если файла не существует или с ним что-то не так."""
 
 def db_init() : 
-    global data_base_name, next_ID
     new_or_existing = view.choice_of_two("Вы будете работать с уже существующим .csv-файлом заметок или хотите создать новый?", 
                        "1 - работать с уже существующим", "2 - создать новый")
     
@@ -45,7 +42,7 @@ def db_init() :
             user_input = view.string_input("\nВведите полное имя файла, с которым хотите работать: ")
             # !!!!!!!!!!!!!! Добавить проверку на расширение файла !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if os.path.exists(user_input) and os.path.isfile(user_input) : 
-                data_base_name = user_input
+                global_data.data_base_name = user_input
             else : 
                 view.out("\nФайла с таким именем не существует. Программа завершает работу...")
                 return -1
@@ -77,18 +74,18 @@ def db_init() :
         db_file_name = view.string_input("\nВведите имя нового файла заметок без расширения.\n"+
                                                    "Расширение .csv будет присвоено ему автоматически: \n ===> ")
         db_file_name = db_file_name + ".csv"
-        data_base_name = os.path.join(db_path_name, db_file_name)
-        if os.path.exists(Path(data_base_name)) : 
+        global_data.data_base_name = os.path.join(db_path_name, db_file_name)
+        if os.path.exists(Path(global_data.data_base_name)) : 
             view.out("\nВы ввели имя существующего файла. Программа завершает работу... ")
             return -1
         else : 
-            with open(data_base_name, "x", encoding = "utf-8") as db: 
+            with open(global_data.data_base_name, "x", encoding = "utf-8") as db: 
                 return 0
     else : 
         view.out("\nВы ввели недопустимое значение. Программа завершает работу... ")
         return -1
-    view.out("\nБД заметок с именем {} готова к работе...\n".format(data_base_name))
-    stat_result = os.stat(data_base_name)
+    view.out("\nБД заметок с именем {} готова к работе...\n".format(global_data.data_base_name))
+    stat_result = os.stat(global_data.data_base_name)
     if stat_result.st_size == 0 : 
         return 0
     else : 
@@ -164,14 +161,15 @@ def write_data_to_csv_file (name_of_file, list_of_list_of_strings) :
 #     else : 
 #         return False
 
-print(f"Файл с именем {data_base_name} существует." if db_file_exists(data_base_name) else f"Файла с именем {data_base_name} не существует.")
+print(f"Файл с именем {global_data.data_base_name} существует." if db_file_exists(global_data.data_base_name) 
+      else f"Файла с именем {global_data.data_base_name} не существует.")
 print("А существует ли файл C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.t ?" , end = " - " )
 print(db_file_exists("C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.txt"))
 print()
 print("А является ли файл C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION\Konkurs.csv csv-файлом?" , end = " - " )
 print(db_file_is_csv(Path("Konkurs.csv")))
 
-read_file_result = get_data (data_base_name)
+read_file_result = get_data (global_data.data_base_name)
 print(type(read_file_result))
 
 # print(f"Является ли содержимое файла заметками? - {if_read_data_are_notes(read_file_result)}")

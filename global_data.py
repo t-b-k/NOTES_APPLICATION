@@ -52,6 +52,9 @@ int_db_structure = []
 # В глобальной переменной next_ID содержится следующий готовый к использованию идентификатор заметки
 next_ID = 1
 
+# В глобальной переменной data_base_name хранится имя .csv-файла, с которым мы работаем в данном сеансе
+data_base_name = ""
+
 print(datetime.today())
 print(date.today())
 # print(DEFAULT_PATH_TO_DATA_BASE)

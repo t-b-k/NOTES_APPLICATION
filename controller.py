@@ -1,59 +1,59 @@
 from datetime import datetime, date, time
 import view
 import model
-from global_data import *
+import global_data
 import csv_db_connect
 
 READING_ERROR = "ОШИБКА ЧТЕНИЯ ДАННЫХ"
 
 def run() : 
-    global int_db_structure
-    global next_ID
-    print(f"Модуль controller.py, метод run(), next_ID = {next_ID}")
-    print(f"Модуль controller.py, метод run(), string 13. int_db_structure = \n{int_db_structure}\n")
-    view.out(HELLO_MESSAGE)
+    # global int_db_structure
+    # global next_ID
+    print(f"Модуль controller.py, метод run(), next_ID = {global_data.next_ID}")
+    print(f"Модуль controller.py, метод run(), string 13. int_db_structure = \n{global_data.int_db_structure}\n")
+    view.out(global_data.HELLO_MESSAGE)
     onward = True
     notes_exist = csv_db_connect.db_init()
     if notes_exist == -1: 
         onward = False
     elif notes_exist == 1 : 
-        int_db_structure = model.read_data_from_csv(csv_db_connect.data_base_name)
-        next_ID = model.get_next_ID(int_db_structure)
+        global_data.int_db_structure = model.read_data_from_csv(global_data.data_base_name)
+        global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
         print("Считали данные из файла с заметками. ")
-        print(f"Модуль controller.py, метод run(), string 22. int_db_structure = \n{int_db_structure}\n")
-        print(f"Модуль controller.py, метод run(), string 23. next_ID = {next_ID}")
-        print(f"Количество заметок в исходном файле = {len(int_db_structure)}")
-        if len(int_db_structure) == 0 : 
+        print(f"Модуль controller.py, метод run(), string 22. int_db_structure = \n{global_data.int_db_structure}\n")
+        print(f"Модуль controller.py, метод run(), string 23. next_ID = {global_data.next_ID}")
+        print(f"Количество заметок в исходном файле = {len(global_data.int_db_structure)}")
+        if len(global_data.int_db_structure) == 0 : 
             print(READING_ERROR)
         else : 
             print("Ваши заметки: \n")
-            print(int_db_structure)
+            print(global_data.int_db_structure)
     
     # Файл с заметками определен
-    view.out(MAIN_MENU)
+    view.out(global_data.MAIN_MENU)
     while onward : 
          action = view.string_input("  ===> ")
          match action :
              case 'm': 
-                 view.out(COMMANDS_LIST)
+                 view.out(global_data.COMMANDS_LIST)
              case 'l': 
                  print("Ваши заметки: \n")
-                 print(int_db_structure)
+                 print(global_data.int_db_structure)
              case 'a': 
                  note_data = request_note_data()
                  print(f"Type of note_data = {type(note_data)}")
                  print(note_data[0])
                  print(note_data[1])
-                 print(f"Длина int_db_structure = {len(int_db_structure)}")
-                 model.add_note(int_db_structure, next_ID, "Таня", "Наша Таня громко плачет")
-                 next_ID = model.get_next_ID(int_db_structure)
-                 print(f"Длина int_db_structure после выполнения метода add_note = {len(int_db_structure)}")
-                 print(f"Новый next_ID = {next_ID}")
+                 print(f"Длина int_db_structure = {len(global_data.int_db_structure)}")
+                 model.add_note(note_data[0], note_data[1])
+                 global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
+                 print(f"Длина int_db_structure после выполнения метода add_note = {len(global_data.int_db_structure)}")
+                 print(f"Новый next_ID = {global_data.next_ID}")
                  #print(f"Type of added_note = {type(added_note)}")
                 #  used_ID = added_note[0]
-                 view.out("В базу добавлена заметка c ID = {}:".format(next_ID-1))
-                 view.out(model.note_to_string(int_db_structure[-1]))
-                 print(int_db_structure)
+                 view.out("В базу добавлена заметка c ID = {}:".format(global_data.next_ID-1))
+                 view.out(model.note_for_print(global_data.int_db_structure[-1]))
+                 print(global_data.int_db_structure)
     #         case 'f': 
     #             onward = False
     #         case 'e': 
@@ -70,7 +70,7 @@ def run() :
                 view.out("Недопустимая команда. Попробуйте еще раз.")
 
 def request_note_data() : 
-    return view.string_input(NOTE_NAME_INVIT), view.string_input(NOTE_BODY_INVIT)
+    return view.string_input(global_data.NOTE_NAME_INVIT), view.string_input(global_data.NOTE_BODY_INVIT)
 
 # def db_init() : 
 #     global data_base_name
