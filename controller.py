@@ -7,7 +7,8 @@ import csv_db_connect
 READING_ERROR = "ОШИБКА ЧТЕНИЯ ДАННЫХ"
 
 def run() : 
-    global int_db_structure, next_ID
+    global int_db_structure
+    global next_ID
     print(f"Модуль controller.py, метод run(), next_ID = {next_ID}")
     view.out(global_data.HELLO_MESSAGE)
     onward = True
