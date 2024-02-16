@@ -37,9 +37,8 @@ def run() :
              case global_data.MENU: 
                  view.out(global_data.COMMANDS_LIST)
              case global_data.LIST: 
-                 print("Вот все ваши заметки: \n")
-                 print("________________________________________________________________________________________________________")
-                 print(global_data.int_db_structure)
+                 print("--------------------------Вот все ваши заметки:-----------------------------\n")
+                 view.print_all_notes()
              case global_data.ADD: 
                  note_data = request_note_data()
                  print(f"Type of note_data = {type(note_data)}")
@@ -53,19 +52,27 @@ def run() :
                  #print(f"Type of added_note = {type(added_note)}")
                 #  used_ID = added_note[0]
                  view.out("В базу добавлена заметка c ID = {}:".format(global_data.next_ID-1))
-                 print("Печать списка строк: ")
+                 print("*************************************************************")
+                 print("Печать заметки как есть: ")
+                 print(global_data.int_db_structure[-1])
+                 print("Печать после преобразования в список строк: ")
                  view.print_note(model.note_for_print(global_data.int_db_structure[-1]))
-                 print("Печать неподготовленной заметки: ")
-                 view.print_note(global_data.int_db_structure[-1])
-                 print(global_data.int_db_structure)
+                #  print("Печать неподготовленной заметки: ")
+                #  view.print_note(global_data.int_db_structure[-1])
+                 view.print_all_notes()
     #         case 'f': 
     #             onward = False
     #         case 'e': 
     #             onward = False
              case global_data.DELETE: 
+                 view.print_all_notes()
+                 id_to_delete = int(view.string_input("Введите ID заметки, которую хотите удалить: "))
+                 if (model.remove_note_with_id(id_to_delete) == -1): 
+                     view.out(f"!!! Заметки с ID = {id_to_delete} нет.")
+                 else : 
+                     view.out(f"!!! Заметка с ID = {id_to_delete} удалена.")
+             case global_data.COPY: 
                  onward = False
-    #         case 'c': 
-    #             onward = False
     #         case 's': 
     #             onward = False
              case 'q': 
