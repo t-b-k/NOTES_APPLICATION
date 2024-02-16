@@ -1,10 +1,22 @@
 from datetime import datetime, date, time
+from dateutil.parser import parse
 import view
 import model
 import global_data
 import csv_db_connect
 
 READING_ERROR = "ОШИБКА ЧТЕНИЯ ДАННЫХ"
+SEARCH_OPTIONS = "\n\t".join(["Выберите вариант поиска:", "1 - по ID", "2 - по заголовку", 
+                             "3 - по фрагменту заголовка или текста", "4 - по дате создания\n ===> "]) 
+MODIFY_OPTIONS = "\n\t".join(["Что будете менять?", "1 - заголовок", "2 - текст\n ===> "])
+
+SEARCH_BY_ID = '1'
+SEARCH_BY_HEADER = '2'
+SEARCH_BY_FRAGMENT = '3'
+SEARCH_BY_DATE = '4'
+
+CHANGE_HEADER = '1'
+CHANGE_TEXT = '2'
 
 def run() : 
     # global int_db_structure
@@ -32,52 +44,111 @@ def run() :
     # Файл с заметками определен
     view.out(global_data.MAIN_MENU)
     while onward : 
-         action = view.string_input("  ===> ")
-         match action :
-             case global_data.MENU: 
-                 view.out(global_data.COMMANDS_LIST)
-             case global_data.LIST: 
-                 print("--------------------------Вот все ваши заметки:-----------------------------\n")
-                 view.print_all_notes()
-             case global_data.ADD: 
-                 note_data = request_note_data()
-                 print(f"Type of note_data = {type(note_data)}")
-                 print(note_data[0])
-                 print(note_data[1])
-                 print(f"Длина int_db_structure = {len(global_data.int_db_structure)}")
-                 model.add_note(note_data[0], note_data[1])
-                 global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
-                 print(f"Длина int_db_structure после выполнения метода add_note = {len(global_data.int_db_structure)}")
-                 print(f"Новый next_ID = {global_data.next_ID}")
-                 #print(f"Type of added_note = {type(added_note)}")
+        action = view.string_input("  ===> ")
+        match action :
+            case global_data.MENU: 
+                view.out(global_data.COMMANDS_LIST)
+            case global_data.LIST: 
+                print("--------------------------Вот все ваши заметки:-----------------------------\n")
+                view.print_all_notes()
+            case global_data.ADD: 
+                note_data = request_note_data()
+                print(f"Type of note_data = {type(note_data)}")
+                print(note_data[0])
+                print(note_data[1])
+                print(f"Длина int_db_structure = {len(global_data.int_db_structure)}")
+                model.add_note(note_data[0], note_data[1])
+                global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
+                print(f"Длина int_db_structure после выполнения метода add_note = {len(global_data.int_db_structure)}")
+                print(f"Новый next_ID = {global_data.next_ID}")
+                #print(f"Type of added_note = {type(added_note)}")
                 #  used_ID = added_note[0]
-                 view.out("В базу добавлена заметка c ID = {}:".format(global_data.next_ID-1))
-                 print("*************************************************************")
-                 print("Печать заметки как есть: ")
-                 print(global_data.int_db_structure[-1])
-                 print("Печать после преобразования в список строк: ")
-                 view.print_note(model.note_for_print(global_data.int_db_structure[-1]))
+                view.out("В базу добавлена заметка c ID = {}:".format(global_data.next_ID-1))
+                print("*************************************************************")
+                print("Печать заметки как есть: ")
+                print(global_data.int_db_structure[-1])
+                print("Печать после преобразования в список строк: ")
+                view.print_note(model.note_for_print(global_data.int_db_structure[-1]))
                 #  print("Печать неподготовленной заметки: ")
                 #  view.print_note(global_data.int_db_structure[-1])
-                 view.print_all_notes()
-    #         case 'f': 
-    #             onward = False
-    #         case 'e': 
-    #             onward = False
-             case global_data.DELETE: 
-                 view.print_all_notes()
-                 id_to_delete = int(view.string_input("Введите ID заметки, которую хотите удалить: "))
-                 if (model.remove_note_with_id(id_to_delete) == -1): 
-                     view.out(f"!!! Заметки с ID = {id_to_delete} нет.")
-                 else : 
-                     view.out(f"!!! Заметка с ID = {id_to_delete} удалена.")
-             case global_data.COPY: 
-                 onward = False
-    #         case 's': 
-    #             onward = False
-             case 'q': 
+                view.print_all_notes()
+            case global_data.FIND: 
+                user_choice = view.string_input(SEARCH_OPTIONS)
+                if user_choice == '1': 
+                    id_to_show = view.int_input("Введите ID заметки, которую хотите просмотреть:\n ===> ")
+                    note_to_show = model.get_note_by_id(id_to_show)
+                    if note_to_show != [] : 
+                        view.print_note(model.note_for_print(note_to_show))
+                    else : 
+                        view.out("Заметки с таким ID нет в базе.")
+                elif user_choice == '2': 
+                    header_to_find = view.string_input("Введите заголовок заметки, которую хотите просмотреть:\n ===> ")
+                    note_to_show = model.get_note_by_header(header_to_find)
+                    if note_to_show != [] : 
+                        view.print_note(model.note_for_print(note_to_show))
+                    else : 
+                        view.out("Заметки с таким названием нет в базе.")
+                elif user_choice == '3': 
+                    fragment_to_find = view.string_input("Введите фрагмент, по которому надо искать:\n ===> ")
+                    note_to_show = model.get_note_by_fragment(fragment_to_find)
+                    if note_to_show != [] : 
+                        view.print_note(model.note_for_print(note_to_show))
+                    else : 
+                        view.out("Заметки, содержащей такой фрагмент, нет в базе.")
+                elif user_choice == '4': 
+                    date_to_find = parse(view.string_input("Введите дату, по которой надо искать:\n ===> "))
+                    list_of_notes_to_show = model.get_notes_by_date(date_to_find)
+                    if list_of_notes_to_show != [] : 
+                        view.print_notes(list_of_notes_to_show)
+                    else : 
+                        view.out("Заметок, созданных в эту дату, нет в базе.")
+                else : 
+                    view.out("Вы ввели недопустимое значение. Осуществить поиск не получится. ")
+            case global_data.EDIT: 
+                to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите редактировать?", "1 - если  знаете", 
+                                   "2 - если вам надо просмотреть список заметок")
+                if to_do == 2 or to_do == 1:
+                    if to_do == 2 : 
+                        view.print_all_notes()
+                    id_to_modify = view.string_input("Введите ID заметки, в которую хотите внести изменения:\n ===> ")
+                    ind = model.get_ind_of_note_with_id(int(id_to_modify)) 
+                    if ind == -1 : 
+                        view.out("!!! Заметки с таким ID не существует.")
+                    else : 
+                        user_choice = view.string_input(MODIFY_OPTIONS)
+                        if user_choice == '1': 
+                            new_header = view.string_input("Введите новый заголовок:\n ===> ")
+                            if new_header != "" : 
+                                ind = model.get_ind_of_note_with_id(id_to_modify)
+                                global_data.int_db_structure[ind][1] = new_header
+                                view.out(f"Заголовок заметки c ID = {id_to_modify} изменен: ")
+                                view.print_note(model.note_for_print(global_data.int_db_structure[ind]))
+                                
+                        elif user_choice == '2': 
+                            new_body = view.string_input("Введите новый текст заметки:\n ===> ")
+                            if new_body != "" :  
+                                global_data.int_db_structure[ind][2] = new_body
+                                view.out(f"Текст заметки c ID = {id_to_modify} изменен: ")
+                                view.print_note(model.note_for_print(global_data.int_db_structure[ind]))
+                        else: 
+                            view.out("Вы ввели недопустимое значение.")
+                else : 
+                    view.out("Вы ввели некорректное значение.")
                 onward = False
-             case _ : 
+            case global_data.DELETE: 
+                view.print_all_notes()
+                id_to_delete = int(view.string_input("Введите ID заметки, которую хотите удалить: "))
+                if (model.remove_note_with_id(id_to_delete) == -1): 
+                    view.out(f"!!! Заметки с ID = {id_to_delete} нет.")
+                else : 
+                    view.out(f"!!! Заметка с ID = {id_to_delete} удалена.")
+            case global_data.COPY_DATA_BASE: 
+                onward = False
+            case global_data.SAVE: 
+                onward = False
+            case global_data.QUIT: 
+                onward = False
+            case _ : 
                 view.out("Недопустимая команда. Попробуйте еще раз.")
 
 def request_note_data() : 

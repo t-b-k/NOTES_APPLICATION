@@ -59,7 +59,7 @@ def add_note(header, text) :
 
 def note_for_print (note) : 
     printable_note = [(note[0], note[1], note[2], note[3])]
-    print(f"Преобразованная заметка: \n{printable_note}")
+    # print(f"Преобразованная заметка: \n{printable_note}")
     return printable_note
 
 # Метод ищет в списке заметок заметку с ID=id и возвращает ее индекс.
@@ -83,8 +83,61 @@ def remove_note_with_id(id_to_delete) :
         global_data.int_db_structure.remove(global_data.int_db_structure[ind])
         return 0
 
+# Метод ищет заметку по ее ID
+# Возвращает ее копию или пустой список, если такой заметки нет в базе   
+def get_note_by_id(id_to_show) : 
+    ind = get_ind_of_note_with_id(id_to_show)
+    result = global_data.int_db_structure[ind] if ind != -1 else []
+    return result
 
+# Метод ищет в списке заметок заметку с заданным заголовком и возвращает ее индекс.
+# Если такой заметки нет, возвращает -1
+def get_ind_of_note_with_header(header) : 
+    ind = -1
+    for i in range(len(global_data.int_db_structure)) : 
+        if global_data.int_db_structure[i][1] == header : 
+            ind = i
+    return ind
 
+# Метод ищет заметку по ее заголовку
+# Возвращает ее копию или пустой список, если такой заметки нет в базе   
+def get_note_by_header(header_to_show) : 
+    ind = get_ind_of_note_with_header(header_to_show)
+    result = global_data.int_db_structure[ind] if ind != -1 else []
+    return result
 
+# Метод ищет в списке заметок заметку, содержащую заданный фрагмент текста в заголовке или в теле, и возвращает ее индекс.
+# Если такой заметки нет, возвращает -1
+def get_ind_of_note_with_fragment(fragment) : 
+    ind = -1
+    for i in range(len(global_data.int_db_structure)) : 
+        if global_data.int_db_structure[i][1].find(fragment) != -1 or global_data.int_db_structure[i][2].find(fragment) != -1: 
+            ind = i
+    return ind
 
+# Метод ищет заметку по фрагменту
+# Возвращает ее копию или пустой список, если такой заметки нет в базе   
+def get_note_by_fragment(fragment_to_find) : 
+    ind = get_ind_of_note_with_fragment(fragment_to_find)
+    result = global_data.int_db_structure[ind] if ind != -1 else []
+    return result
+
+# Метод ищет в списке заметок заметки, созданные в определенную дату, и возвращает список их индексов.
+# Если таких заметок нет, возвращает пустой список
+def get_ind_of_note_with_date(date_to_find) : 
+    result = []
+    for i in range(len(global_data.int_db_structure)) : 
+        print(parse(global_data.int_db_structure[i][3]).date())
+        if parse(global_data.int_db_structure[i][3]).date() == date_to_find.date() :
+            result.append(i)
+    return result
+
+# Метод ищет заметки по фрагменту
+# Возвращает их список или пустой список, если таких заметок нет в базе   
+def get_notes_by_date(date_to_find) : 
+    result = []
+    inds = get_ind_of_note_with_date(date_to_find)
+    for i in inds : 
+        result.append(global_data.int_db_structure[i])
+    return result
 
