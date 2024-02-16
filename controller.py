@@ -34,12 +34,13 @@ def run() :
     while onward : 
          action = view.string_input("  ===> ")
          match action :
-             case 'm': 
+             case global_data.MENU: 
                  view.out(global_data.COMMANDS_LIST)
-             case 'l': 
-                 print("Ваши заметки: \n")
+             case global_data.LIST: 
+                 print("Вот все ваши заметки: \n")
+                 print("________________________________________________________________________________________________________")
                  print(global_data.int_db_structure)
-             case 'a': 
+             case global_data.ADD: 
                  note_data = request_note_data()
                  print(f"Type of note_data = {type(note_data)}")
                  print(note_data[0])
@@ -52,14 +53,17 @@ def run() :
                  #print(f"Type of added_note = {type(added_note)}")
                 #  used_ID = added_note[0]
                  view.out("В базу добавлена заметка c ID = {}:".format(global_data.next_ID-1))
-                 view.out(model.note_for_print(global_data.int_db_structure[-1]))
+                 print("Печать списка строк: ")
+                 view.print_note(model.note_for_print(global_data.int_db_structure[-1]))
+                 print("Печать неподготовленной заметки: ")
+                 view.print_note(global_data.int_db_structure[-1])
                  print(global_data.int_db_structure)
     #         case 'f': 
     #             onward = False
     #         case 'e': 
     #             onward = False
-    #         case 'd': 
-    #             onward = False
+             case global_data.DELETE: 
+                 onward = False
     #         case 'c': 
     #             onward = False
     #         case 's': 

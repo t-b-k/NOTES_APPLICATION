@@ -15,3 +15,6 @@ def string_input (invit_message) :
 def print_note (list_of_4_strigs) : 
     columns = ["ID", "Заголовок", "Текст заметки".ljust(50), "Дата/время создания"]
     print(tabulate(list_of_4_strigs, headers=columns))
+
+def print_all_notes() : 
+    columns = ["ID", "Заголовок", "Текст заметки".ljust(50), "Дата/время создания"]
