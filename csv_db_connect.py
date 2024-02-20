@@ -263,5 +263,5 @@ def write_changes_to_another_csv_file () :
 
     else : 
         view.out("\nФайла с таким именем не существует. Будет создан новый файл. ")
-        write_changes(file_to_write)
+        write_changes_to_file(file_to_write)
 
