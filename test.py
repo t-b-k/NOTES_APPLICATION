@@ -80,3 +80,6 @@ path_name = os.path.dirname(Path("..\\test.csv"))
 print("..\\test.csv")
 print(path_name)
 print(path_name == '..')
+
+ctrl_z = input("Введите Ctrl+Z")
+print("")

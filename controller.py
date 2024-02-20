@@ -153,18 +153,17 @@ def run() :
                     view.out(f"!!! Заметка с ID = {id_to_delete} удалена.")
 
             case global_data.WRITE_CHANGES_TO_THE_INITIAL_FILE: 
-                if csv_db_connect.write_changes_to_data_base() == 0 :
+                if csv_db_connect.write_changes_to_data_base() != 0 :
                     view.out("Не удалось выполнить запись в базу данных")
                 else : 
                     view.out("\nЗапись прошла успешно")
 
             case global_data.SAVE_DATA_TO_ANOTHER_FILE: 
-                if csv_db_connect.write_changes_to_another_csv_file() == 0 :
+                if csv_db_connect.write_changes_to_another_csv_file() != 0 :
                     view.out("Не удалось выполнить запись в файл")
                 else : 
                     view.out("\nЗапись прошла успешно")
 
-                
             case global_data.QUIT: 
                 onward = False
 
