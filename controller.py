@@ -142,9 +142,14 @@ def run() :
                     view.out(f"!!! Заметки с ID = {id_to_delete} нет.")
                 else : 
                     view.out(f"!!! Заметка с ID = {id_to_delete} удалена.")
-            case global_data.COPY_DATA_BASE: 
-                onward = False
-            case global_data.SAVE: 
+            case global_data.WRITE_CHANGES_TO_THE_INITIAL_FILE: 
+                with open("test.csv", 'w', encoding='utf-8') as db : 
+                    data_to_write = []
+                    for note in global_data.int_db_structure : 
+                        print(";".join(note)+"\n")
+                        data_to_write.append(";".join(note)+"\n")
+                    db.writelines(data_to_write)
+            case global_data.SAVE_DATA_TO_THE_NEW_FILE: 
                 onward = False
             case global_data.QUIT: 
                 onward = False
