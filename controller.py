@@ -1,5 +1,7 @@
 from datetime import datetime, date, time
 from dateutil.parser import parse
+import os
+from pathlib import Path
 import view
 import model
 import global_data
@@ -42,15 +44,18 @@ def run() :
             print(global_data.int_db_structure)
     
     # Файл с заметками определен
-    view.out(global_data.MAIN_MENU)
+    
     while onward : 
-        action = view.string_input("  ===> ")
+        view.out(global_data.MAIN_MENU)
+        action = view.string_input("  ===> ").lower()
         match action :
             case global_data.MENU: 
                 view.out(global_data.COMMANDS_LIST)
+
             case global_data.LIST: 
                 print("--------------------------Вот все ваши заметки:-----------------------------\n")
                 view.print_all_notes()
+
             case global_data.ADD: 
                 note_data = request_note_data()
                 print(f"Type of note_data = {type(note_data)}")
@@ -72,6 +77,7 @@ def run() :
                 #  print("Печать неподготовленной заметки: ")
                 #  view.print_note(global_data.int_db_structure[-1])
                 view.print_all_notes()
+
             case global_data.FIND: 
                 user_choice = view.string_input(SEARCH_OPTIONS)
                 if user_choice == '1': 
@@ -104,6 +110,7 @@ def run() :
                         view.out("Заметок, созданных в эту дату, нет в базе.")
                 else : 
                     view.out("Вы ввели недопустимое значение. Осуществить поиск не получится. ")
+
             case global_data.EDIT: 
                 to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите редактировать?", "1 - если  знаете", 
                                    "2 - если вам надо просмотреть список заметок")
@@ -112,16 +119,18 @@ def run() :
                         view.print_all_notes()
                     id_to_modify = view.string_input("Введите ID заметки, в которую хотите внести изменения:\n ===> ")
                     ind = model.get_ind_of_note_with_id(int(id_to_modify)) 
+                    print(ind)
                     if ind == -1 : 
                         view.out("!!! Заметки с таким ID не существует.")
                     else : 
                         user_choice = view.string_input(MODIFY_OPTIONS)
-                        if user_choice == '1': 
+                        if user_choice == CHANGE_HEADER: 
                             new_header = view.string_input("Введите новый заголовок:\n ===> ")
                             if new_header != "" : 
-                                ind = model.get_ind_of_note_with_id(id_to_modify)
+                                ind = model.get_ind_of_note_with_id(int(id_to_modify))
                                 global_data.int_db_structure[ind][1] = new_header
-                                view.out(f"Заголовок заметки c ID = {id_to_modify} изменен: ")
+                                view.out(f"\nЗаголовок заметки c ID = {id_to_modify} изменен: \n")
+                                view.out(f"\nИндекс = {ind}\n")
                                 view.print_note(model.note_for_print(global_data.int_db_structure[ind]))
                                 
                         elif user_choice == '2': 
@@ -131,10 +140,10 @@ def run() :
                                 view.out(f"Текст заметки c ID = {id_to_modify} изменен: ")
                                 view.print_note(model.note_for_print(global_data.int_db_structure[ind]))
                         else: 
-                            view.out("Вы ввели недопустимое значение.")
+                            view.out("Вы ввели недопустимое значение. Никаких изменений произведено не будет. ")
                 else : 
-                    view.out("Вы ввели некорректное значение.")
-                onward = False
+                    view.out("Вы ввели некорректное значение. Содержимое базы останется неизменным.")
+
             case global_data.DELETE: 
                 view.print_all_notes()
                 id_to_delete = int(view.string_input("Введите ID заметки, которую хотите удалить: "))
@@ -142,17 +151,23 @@ def run() :
                     view.out(f"!!! Заметки с ID = {id_to_delete} нет.")
                 else : 
                     view.out(f"!!! Заметка с ID = {id_to_delete} удалена.")
+
             case global_data.WRITE_CHANGES_TO_THE_INITIAL_FILE: 
-                with open("test.csv", 'w', encoding='utf-8') as db : 
-                    data_to_write = []
-                    for note in global_data.int_db_structure : 
-                        print(";".join(note)+"\n")
-                        data_to_write.append(";".join(note)+"\n")
-                    db.writelines(data_to_write)
-            case global_data.SAVE_DATA_TO_THE_NEW_FILE: 
-                onward = False
+                if csv_db_connect.write_changes_to_data_base() == 0 :
+                    view.out("Не удалось выполнить запись в базу данных")
+                else : 
+                    view.out("\nЗапись прошла успешно")
+
+            case global_data.SAVE_DATA_TO_ANOTHER_FILE: 
+                if csv_db_connect.write_changes_to_another_csv_file() == 0 :
+                    view.out("Не удалось выполнить запись в файл")
+                else : 
+                    view.out("\nЗапись прошла успешно")
+
+                
             case global_data.QUIT: 
                 onward = False
+
             case _ : 
                 view.out("Недопустимая команда. Попробуйте еще раз.")
 

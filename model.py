@@ -69,6 +69,7 @@ def get_ind_of_note_with_id(id) :
     for i in range(len(global_data.int_db_structure)) : 
         if int(global_data.int_db_structure[i][0]) == id : 
             ind = i
+    print(f"Искомый индекс заметки равен {ind}")
     return ind
 
 # Метод удаляет из списка заметку с ID=id_to_delete
