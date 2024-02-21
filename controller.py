@@ -28,9 +28,10 @@ def run() :
     view.out(global_data.HELLO_MESSAGE)
     onward = True
     notes_exist = csv_db_connect.db_init()
-    if notes_exist == -1: 
+    
+    if notes_exist == -1: # Возникли проблемы с открытием/созданием файла, указанного пользователем
         onward = False
-    elif notes_exist == 1 : 
+    elif notes_exist == 1 : # Файл с заметками определен, считываем его во внутреннюю структуру данных
         global_data.int_db_structure = model.read_data_from_csv(global_data.data_base_name)
         global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
         print("Считали данные из файла с заметками. ")
@@ -43,7 +44,7 @@ def run() :
             print("Ваши заметки: \n")
             print(global_data.int_db_structure)
     
-    # Файл с заметками определен
+    # Файл с заметками считан, можно приступать к работе. 
     
     while onward : 
         view.out(global_data.MAIN_MENU)
@@ -163,7 +164,15 @@ def run() :
                     view.out("Не удалось выполнить запись в файл")
                 else : 
                     view.out("\nЗапись прошла успешно")
-
+            
+            case global_data.READ_DATA_FROM_FILE : 
+                new_file_name = csv_db_connect.get_name_of_existing_csv_file()
+                if new_file_name == "" : 
+                    view.out("Вы ввели имя несуществующего файла, перейти к другой базе заметок не получится.")
+                else : 
+                    global_data.data_base_name = new_file_name
+                    model.read_data_from_csv(global_data.data_base_name)
+                
             case global_data.QUIT: 
                 onward = False
 

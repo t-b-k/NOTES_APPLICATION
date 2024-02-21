@@ -246,6 +246,7 @@ def write_changes_to_another_csv_file () :
         print("os.path.exists(os.path.dirname(user_input)) = {}".format(os.path.exists(os.path.dirname(file_to_write))))
         print("os.path.exists(user_input) = {}\n".format(os.path.exists(file_to_write)))
         print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(file_to_write)))
+        return -1
 
     # Если файл с введенным именем уже существует: 
     if os.path.exists(Path(file_to_write)) :  
@@ -254,14 +255,16 @@ def write_changes_to_another_csv_file () :
         view.out("поскольку он может иметь неправильный формат. Выбирайте дозапись, только если уверены, что файл отформатирован правильно. ")
         user_choice = view.choice_of_two("Перезаписываем файл или дописываем в конец? ", "1 - перезаписываем", "2 - дописываем в конец")
         if user_choice == global_data.REWRITE : 
-            write_changes_to_file(file_to_write)
+            return write_changes_to_file(file_to_write)
             
         elif user_choice == global_data.APPEND : 
-            write_changes_to_file(file_to_write, 'a')
+            return write_changes_to_file(file_to_write, 'a')
+
         else : 
             view.out("Вы ввели некорректное значение. Завершить операцию не получится. ")
-
+            return -1
     else : 
         view.out("\nФайла с таким именем не существует. Будет создан новый файл. ")
         write_changes_to_file(file_to_write)
+        return 0
 
