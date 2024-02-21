@@ -21,7 +21,7 @@ def print_note (list_of_4_strigs) :
     print()
 
 def print_all_notes() : 
-    print("----------------------Вот все ваши заметки: -------------------------------------")
+    print("----------------------Вот все ваши заметки: --------------------------------------------------")
     columns = ["ID", "Заголовок", "Текст заметки".ljust(50), "Дата/время создания"]
     print(tabulate(global_data.int_db_structure, headers=columns))
     print()

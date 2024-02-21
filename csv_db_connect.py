@@ -25,9 +25,11 @@ print(global_data.data_base_name)
 print(type(str(global_data.data_base_name)))
 
 """ Метод db_init() возвращает: 
-        Номер следующего доступного к использованию ID - если файл заметок существует и не пуст
+        1 - если файл заметок существует и не пуст
         0 - если файл заметок пуст или вновь создан
-       -1 - если файла не существует или с ним что-то не так."""
+       -1 - если файла не существует или с ним что-то не так, или пользователь не справился с вводом
+    В результате выполнения данного метода присваевается значение глобальной переменной
+    global_data.data_base_name"""
 
 def db_init() : 
     new_or_existing = view.choice_of_two("Вы будете работать с уже существующим .csv-файлом заметок или хотите создать новый?", 
@@ -35,14 +37,16 @@ def db_init() :
     
     # Если будем работать с существующим файлом: 
     if new_or_existing == global_data.EXISTING_FILE : 
-        default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, "1 - использовать файл по умолчанию", "2 - использовать другой файл")
+        default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, 
+                                              "1 - использовать файл по умолчанию", 
+                                              "2 - использовать другой файл")
         
         # Если пользователь хочет указать свой файл: 
         if default_or_other == global_data.OTHER_FILE_NAME : 
             global_data.data_base_name = get_name_of_existing_csv_file()
             if global_data.data_base_name == "" : 
                 view.out("Вы ввели имя несуществующего файла.")
-                return -1
+                return -1   # Такого файла не существует
             
         # Если пользователь ввел недопустимое значение: 
         elif default_or_other != global_data.DEFAULT_FILE_NAME : 
@@ -58,8 +62,8 @@ def db_init() :
             return -1
         # Если хочет создать новый файл в каталоге, отличном от текущего рабочего: 
         elif  user_choice == global_data.OTHER_DIRECTORY :
-            db_path_name = view.string_input("Введите путь к каталогу, в котором хотите создать файл, или нажмите Enter.\nПо умолчанию будет использоваться"+
-                                   f" каталог: {DEFAULT_PATH_TO_DATA_BASE}\n ===> ")
+            db_path_name = view.string_input("Введите путь к каталогу, в котором хотите создать файл, или нажмите Enter.\n", 
+                                             "По умолчанию будет использоваться"+f" каталог: {DEFAULT_PATH_TO_DATA_BASE}\n ===> ")
             if db_path_name == "" : 
                 db_path_name = DEFAULT_PATH_TO_DATA_BASE
             elif not os.path.exists(Path(db_path_name)) or not os.path.isdir(Path(db_path_name)): 
@@ -79,20 +83,12 @@ def db_init() :
         else : 
             with open(global_data.data_base_name, "x", encoding = "utf-8") as db: 
                 view.out("Создан файл {}".format(global_data.data_base_name))
-                return 0
     else : 
         view.out("\nВы ввели недопустимое значение. Программа завершает работу... ")
         return -1
+        
     view.out("\nБД заметок {} готова к работе. Желаем удачи!\n".format(global_data.data_base_name))
-    stat_result = os.stat(global_data.data_base_name)
-    # Возвращаем:
-    #   0, если исходный файл базы данных пуст, 
-    #   1 - если в нем есть данные
-
-    if stat_result.st_size == 0 : 
-        return 0
-    else : 
-        return 1
+    return 0
 
 # Метод db_file_exists проверяет переданную в него строку на то, является ли она корректным 
 # полным именем существующего файла
@@ -238,15 +234,16 @@ def write_changes_to_file (file_name, mode='w') :
         return -1
 
 # Запись изменений в другой файл с расширением .csv
+# Возвращаем имя файла, в который была произведена запись, или пустую строку в случае неудачи
 def write_changes_to_another_csv_file () : 
     file_to_write = get_name_of_dest_csv_file ()
     print(file_to_write)
     if file_to_write == "" : 
-        view.out("\n !!! Некорректное имя .csv-файла. Запись в файл не состоялась. ")
+        view.out("\n !!! Некорректное имя .csv-файла. Записать изменения в файл не удалось. !!!")
         print("os.path.exists(os.path.dirname(user_input)) = {}".format(os.path.exists(os.path.dirname(file_to_write))))
         print("os.path.exists(user_input) = {}\n".format(os.path.exists(file_to_write)))
         print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(file_to_write)))
-        return -1
+        return ""
 
     # Если файл с введенным именем уже существует: 
     if os.path.exists(Path(file_to_write)) :  
@@ -266,5 +263,4 @@ def write_changes_to_another_csv_file () :
     else : 
         view.out("\nФайла с таким именем не существует. Будет создан новый файл. ")
         write_changes_to_file(file_to_write)
-        return 0
-
+        return file_to_write

@@ -27,22 +27,28 @@ def run() :
     print(f"Модуль controller.py, метод run(), string 13. int_db_structure = \n{global_data.int_db_structure}\n")
     view.out(global_data.HELLO_MESSAGE)
     onward = True
-    notes_exist = csv_db_connect.db_init()
+    file_defined = csv_db_connect.db_init()
     
-    if notes_exist == -1: # Возникли проблемы с открытием/созданием файла, указанного пользователем
+    if file_defined == -1: # Возникли проблемы с открытием/созданием файла, указанного пользователем
         onward = False
-    elif notes_exist == 1 : # Файл с заметками определен, считываем его во внутреннюю структуру данных
-        global_data.int_db_structure = model.read_data_from_csv(global_data.data_base_name)
-        global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
-        print("Считали данные из файла с заметками. ")
-        print(f"Модуль controller.py, метод run(), string 22. int_db_structure = \n{global_data.int_db_structure}\n")
-        print(f"Модуль controller.py, метод run(), string 23. next_ID = {global_data.next_ID}")
-        print(f"Количество заметок в исходном файле = {len(global_data.int_db_structure)}")
-        if len(global_data.int_db_structure) == 0 : 
-            print(READING_ERROR)
-        else : 
-            print("Ваши заметки: \n")
-            print(global_data.int_db_structure)
+    elif file_defined == 0 : # Файл с определен, надо проверить его на пустоту
+        stat_result = os.stat(global_data.data_base_name)
+    #   если исходный файл базы данных не пуст:
+        if stat_result.st_size != 0 : 
+            global_data.int_db_structure = model.read_data_from_csv(global_data.data_base_name)
+            if len(global_data.int_db_structure) == 0 : 
+                print(READING_ERROR)
+                onward = False
+            else : 
+                print("Вот исходное состояние файла, с которым Вы пожелали работать: \n")
+                view.print_all_notes()
+                global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
+            # print("Считали данные из файла с заметками. ")
+            # print(f"Модуль controller.py, метод run(), string 22. int_db_structure = \n{global_data.int_db_structure}\n")
+            # print(f"Модуль controller.py, метод run(), string 23. next_ID = {global_data.next_ID}")
+            # print(f"Количество заметок в исходном файле = {len(global_data.int_db_structure)}")
+        else: 
+            view.out("Файл, с которым Вы пожелали работать, пуст, так что не все операции меню будут Вам доступны.")
     
     # Файл с заметками считан, можно приступать к работе. 
     
@@ -157,21 +163,35 @@ def run() :
                 if csv_db_connect.write_changes_to_data_base() != 0 :
                     view.out("Не удалось выполнить запись в базу данных")
                 else : 
-                    view.out("\nЗапись прошла успешно")
+                    view.out(f"\nЗапись в файл {global_data.data_base_name} прошла успешно")
 
             case global_data.SAVE_DATA_TO_ANOTHER_FILE: 
-                if csv_db_connect.write_changes_to_another_csv_file() != 0 :
+                destination_file = csv_db_connect.write_changes_to_another_csv_file()
+                if destination_file == '' :
                     view.out("Не удалось выполнить запись в файл")
                 else : 
-                    view.out("\nЗапись прошла успешно")
+                    view.out(f"\nЗапись в файл {destination_file} прошла успешно")
             
             case global_data.READ_DATA_FROM_FILE : 
                 new_file_name = csv_db_connect.get_name_of_existing_csv_file()
                 if new_file_name == "" : 
                     view.out("Вы ввели имя несуществующего файла, перейти к другой базе заметок не получится.")
                 else : 
-                    global_data.data_base_name = new_file_name
-                    model.read_data_from_csv(global_data.data_base_name)
+                    result_of_reading = model.read_data_from_csv(new_file_name)
+                    if len(result_of_reading) == 0 : 
+                        answer = view.choice_of_two("Данный файл пуст. Вы хотите продолжить с ним работу? ", "1 - Да, хочу", "2 - Нет, не хочу")
+                        if answer == 1 : 
+                            global_data.data_base_name = new_file_name
+                            global_data.int_db_structure = result_of_reading
+                            global_data.next_ID = 1
+                        else : 
+                            print(f"Продолжаем работу с файлом заметок {global_data.data_base_name}")
+                    else : 
+                        global_data.data_base_name = new_file_name
+                        global_data.int_db_structure = result_of_reading
+                        print("Вот исходное состояние файла, с которым Вы пожелали работать: \n")
+                        print(global_data.int_db_structure)
+                        global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
                 
             case global_data.QUIT: 
                 onward = False
