@@ -74,6 +74,18 @@ APPEND = 2
 # В глобальной переменной data_base_name хранится имя .csv-файла, с которым мы работаем в данном сеансе
 data_base_name = ""
 
+# ОПЦИИ ПОИСКА ЗАМЕТОК В БАЗЕ
+
+SEARCH_OPTIONS = "\n\t".join(["Выберите вариант поиска:", "1 - по ID", "2 - по названию", 
+                             "3 - по фрагменту названия или текста", "4 - по дате создания\n ===> "]) 
+
+SEARCH_BY_ID = '1'
+SEARCH_BY_HEADER = '2'
+SEARCH_BY_FRAGMENT = '3'
+SEARCH_BY_DATE = '4'
+
+
+
 print(datetime.today())
 print(date.today())
 # print(DEFAULT_PATH_TO_DATA_BASE)
