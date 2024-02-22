@@ -109,9 +109,9 @@ def run() :
 
                 elif user_choice == global_data.SEARCH_BY_FRAGMENT: 
                     fragment_to_find = view.string_input("Введите фрагмент, по которому надо искать:\n ===> ")
-                    note_to_show = model.get_note_by_fragment(fragment_to_find)
-                    if note_to_show != [] : 
-                        view.print_note(model.note_for_print(note_to_show))
+                    notes_to_show = model.get_notes_by_fragment(fragment_to_find)
+                    if notes_to_show != [] : 
+                        view.print_notes(notes_to_show)
                     else : 
                         view.out("Заметки, содержащей такой фрагмент, нет в базе.")
 

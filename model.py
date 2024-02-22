@@ -105,30 +105,40 @@ def get_inds_of_notes_with_header(header) :
 # Метод ищет заметки по заголовку
 # Возвращает ее копию или пустой список, если такой заметки нет в базе   
 def get_notes_by_header(header_to_find) : 
-    if get_inds_of_notes_with_header(header_to_find) != -1 : 
+    if get_inds_of_notes_with_header(header_to_find) != global_data.FAIL : 
         inds = global_data.result_list
+        return get_list_of_notes_by_inds(inds)
     else : 
         return []
-    return get_list_of_notes_by_inds(inds)
+    
 
 # Метод принимает на вход список индексов и возвращает список соответствующих им заметок
 def get_list_of_notes_by_inds(list_of_inds) : 
     set_of_inds = set(list_of_inds)
-    return [global_data.int_db_structure[ind] for ind in set_of_inds]
+    ordered_inds = sorted(list(set_of_inds))
+    return [global_data.int_db_structure[ind] for ind in ordered_inds]
 
-def get_ind_of_note_with_fragment(fragment) : 
-    ind = -1
+# Метод ищет в списке заметок заметки с указанным фрагментом и передает список их индексов 
+# через глобальную переменную global_data.result_list.
+# Возвращает 0, если результат поиска ненулевой.
+# Если таких заметок нет, возвращает -1
+def get_inds_of_notes_with_fragment(fragment) : 
+    global_data.result_list = []
     for i in range(len(global_data.int_db_structure)) : 
-        if global_data.int_db_structure[i][1].find(fragment) != -1 or global_data.int_db_structure[i][2].find(fragment) != -1: 
-            ind = i
-    return ind
+        if (global_data.int_db_structure[i][1].lower().find(fragment.strip().lower()) != -1 or 
+        global_data.int_db_structure[i][2].lower().find(fragment.strip().lower()) != -1) : 
+            global_data.result_list.append(i)
+    return global_data.FAIL if global_data.result_list == [] else global_data.SUCCESS
 
 # Метод ищет заметку по фрагменту
 # Возвращает ее копию или пустой список, если такой заметки нет в базе   
-def get_note_by_fragment(fragment_to_find) : 
-    ind = get_ind_of_note_with_fragment(fragment_to_find)
-    result = global_data.int_db_structure[ind] if ind != -1 else []
-    return result
+def get_notes_by_fragment(fragment_to_find) : 
+    if get_inds_of_notes_with_fragment(fragment_to_find) != -1 : 
+        inds = global_data.result_list
+        return get_list_of_notes_by_inds(inds)
+    else : 
+        return []
+    
 
 # Метод ищет в списке заметок заметки, созданные в определенную дату, и возвращает: 
 #   0 - если метод сработал без ошибок
