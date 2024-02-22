@@ -98,11 +98,12 @@ def run() :
                         view.out("Заметки с таким ID нет в базе.")
 
                 elif user_choice == global_data.SEARCH_BY_HEADER: 
-                    header_to_find = view.string_input("Введите название заметки \n(если точно не помните, лучше искать по фрагменту):\n ===> ")
-                    note_to_show = model.get_note_by_header(header_to_find)
-                    if note_to_show != [] : 
-                        view.out("Найдена заметка: \n")
-                        view.print_note(model.note_for_print(note_to_show))
+                    header_to_find = view.string_input("Введите название заметки \n" + 
+                                    "(если точно не помните, лучше воспользоваться поиском по фрагменту):\n ===> ")
+                    notes_to_show = model.get_notes_by_header(header_to_find)
+                    if notes_to_show != [] : 
+                        view.out("Найдены заметки: \n")
+                        view.print_notes(notes_to_show)
                     else : 
                         view.out("Заметки с таким названием нет в базе.")
 

@@ -91,24 +91,31 @@ def get_note_by_id(id_to_show) :
     result = global_data.int_db_structure[ind] if ind != -1 else []
     return result
 
-# Метод ищет в списке заметок заметку с заданным заголовком и возвращает ее индекс.
-# Если такой заметки нет, возвращает -1
-def get_ind_of_note_with_header(header) : 
-    ind = -1
+# Метод ищет в списке заметок заметки с указанным заголовком и возвращает список их индексов.
+# Возвращает 0, если результат поиска ненулево.
+# Если таких заметок нет, возвращает -1
+def get_inds_of_notes_with_header(header) : 
+    result = -1
+    global_data.result_list = []
     for i in range(len(global_data.int_db_structure)) : 
-        if global_data.int_db_structure[i][1] == header : 
-            ind = i
-    return ind
+        if global_data.int_db_structure[i][1].strip().lower() == header.strip().lower() : 
+            global_data.result_list.append(i)
+    return -1 if global_data.result_list == [] else 0
 
-# Метод ищет заметку по ее заголовку
+# Метод ищет заметки по заголовку
 # Возвращает ее копию или пустой список, если такой заметки нет в базе   
-def get_note_by_header(header_to_show) : 
-    ind = get_ind_of_note_with_header(header_to_show)
-    result = global_data.int_db_structure[ind] if ind != -1 else []
-    return result
+def get_notes_by_header(header_to_find) : 
+    if get_inds_of_notes_with_header(header_to_find) != -1 : 
+        inds = global_data.result_list
+    else : 
+        return []
+    return get_list_of_notes_by_inds(inds)
 
-# Метод ищет в списке заметок заметку, содержащую заданный фрагмент текста в заголовке или в теле, и возвращает ее индекс.
-# Если такой заметки нет, возвращает -1
+# Метод принимает на вход список индексов и возвращает список соответствующих им заметок
+def get_list_of_notes_by_inds(list_of_inds) : 
+    set_of_inds = set(list_of_inds)
+    return [global_data.int_db_structure[ind] for ind in set_of_inds]
+
 def get_ind_of_note_with_fragment(fragment) : 
     ind = -1
     for i in range(len(global_data.int_db_structure)) : 
