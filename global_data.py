@@ -66,9 +66,29 @@ result_list = []
 # В глобальной переменной next_ID содержится следующий готовый к использованию идентификатор заметки
 next_ID = 1
 
+# СООБЩЕНИЯ ОБ ОШИБКАХ
+FILE_WITH_NOTES_IS_EMPTY = "!!! ОБРАТИТЕ ВНИМАНИЕ, ЧТО ВЫБРАННЫЙ ВАМИ ФАЙЛ ПУСТ !!!\n"
+ILLEGAL_NOTE_ID = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: недопустимый идентификатор заметки !!!\n"
+NEGATIVE_NOTE_ID = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: отрицательный идентификатор заметки !!!\n"
+DATE_TIME_PARSING_ERROR = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: невозможно распознать дату/время !!!\n"
+NOT_UNIQUE_IDS_ERROR = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: неуникальные идентификаторы заметок !!!\n"
+WRONG_FIELDS_QTY = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: неверное количество полей в заметке !!!\n"
+ILLEGAL_PATH_FORMAT = "Модуль csv_db_connect.py\n\t!!! Введен некорректный путь к файлу !!!\n"
+ILLEGAL_FILE_NAME = "Модуль csv_db_connect.py\n\t!!! Введенное имя файла содержит недопустимые символы !!!\n"
+NO_SUCH_DIRECTORY = "!!! КАТАЛОГ С ТАКИМ ИМЕНЕМ ОТСУТСТВУЕТ !!! "
+FILE_EXISTS = "!!! ФАЙЛ С ТАКИМ ИМЕНЕМ уже СУЩЕСТВУЕТ !!! "
+INVALID_INPUT = "!!! ВВЕДЕНО НЕДОПУСТИМОЕ ЗНАЧЕНИЕ !!! "
+WRITE_TO_FILE_ERROR = "!!! НЕ УДАЛОСЬ ЗАПИСАТЬ ДАННЫЕ В ФАЙЛ !!! "
+PROGRAM_IS_FINISHING = "ПРОГРАММА ЗАВЕРШАЕТ РАБОТУ... "
+READING_ERROR = "!!! ОШИБКА ЧТЕНИЯ ДАННЫХ !!!\n"
+INVALID_FILE_OR_PATH_NAME = "!!! НЕКОРРЕКТНОЕ ИМЯ ИЛИ ПУТЬ К ФАЙЛУ !!!"
+
 # КОНСТАНТЫ ДЛЯ ОБОЗНАЧЕНИЯ УСПЕХА/НЕУДАЧИ ИСПОЛНЕНИЯ МЕТОДА
 SUCCESS = 0
 FAIL = -1
+FLAGS = {"Wrong file structure":1, "Illegal note ID":2, "Negative note ID":3, 
+         "Wrong date/time format":4, "Not all IDs are unique":5, 
+         "Source file is empty":6}
 
 # КОНСТАНТЫ ДЛЯ РАБОТЫ С ФАЙЛАМИ: 
 EXISTING_FILE = 1
@@ -93,7 +113,12 @@ SEARCH_BY_HEADER = '2'
 SEARCH_BY_FRAGMENT = '3'
 SEARCH_BY_DATE = '4'
 
+# ОПЦИИ РЕДАКТИРОВАНИЯ ЗАМЕТОК
 
+EDIT_OPTIONS = "\n\t".join(["Что хотите изменить?", "1 - заголовок", "2 - текст\n ===> "])
+
+CHANGE_HEADER = '1'
+CHANGE_TEXT = '2'
 
 print(datetime.today())
 print(date.today())
