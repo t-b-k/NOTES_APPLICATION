@@ -86,37 +86,42 @@ def run() :
                 view.print_all_notes()
 
             case global_data.FIND: 
-                user_choice = view.string_input(SEARCH_OPTIONS)
-                if user_choice == '1': 
-                    id_to_show = view.int_input("Введите ID заметки, которую хотите просмотреть:\n ===> ")
+                user_choice = view.string_input(global_data.SEARCH_OPTIONS)
+                if user_choice == global_data.SEARCH_BY_ID: 
+                    id_to_show = view.int_input("Введите ID заметки:\n ===> ")
                     note_to_show = model.get_note_by_id(id_to_show)
                     if note_to_show != [] : 
                         view.print_note(model.note_for_print(note_to_show))
                     else : 
                         view.out("Заметки с таким ID нет в базе.")
-                elif user_choice == '2': 
-                    header_to_find = view.string_input("Введите заголовок заметки, которую хотите просмотреть:\n ===> ")
+
+                elif user_choice == global_data.SEARCH_BY_HEADER: 
+                    header_to_find = view.string_input("Введите название заметки \n(если точно не помните, лучше искать по фрагменту):\n ===> ")
                     note_to_show = model.get_note_by_header(header_to_find)
                     if note_to_show != [] : 
                         view.print_note(model.note_for_print(note_to_show))
                     else : 
                         view.out("Заметки с таким названием нет в базе.")
-                elif user_choice == '3': 
+
+                elif user_choice == global_data.SEARCH_BY_FRAGMENT: 
                     fragment_to_find = view.string_input("Введите фрагмент, по которому надо искать:\n ===> ")
                     note_to_show = model.get_note_by_fragment(fragment_to_find)
                     if note_to_show != [] : 
                         view.print_note(model.note_for_print(note_to_show))
                     else : 
                         view.out("Заметки, содержащей такой фрагмент, нет в базе.")
-                elif user_choice == '4': 
-                    date_to_find = parse(view.string_input("Введите дату, по которой надо искать:\n ===> "))
-                    list_of_notes_to_show = model.get_notes_by_date(date_to_find)
-                    if list_of_notes_to_show != [] : 
-                        view.print_notes(list_of_notes_to_show)
+
+                elif user_choice == global_data.SEARCH_BY_DATE: 
+                    date_to_find = view.string_input("Введите дату:\n ===> ")
+                    if model.get_notes_by_date(date_to_find) != global_data.FAIL : 
+                        if global_data.result_list != [] : 
+                            view.print_notes(global_data.result_list)
+                        else : 
+                            view.out("Заметок, созданных в указанную Вами дату, нет в базе. ")
                     else : 
-                        view.out("Заметок, созданных в эту дату, нет в базе.")
+                        view.out("\nПоиск осуществить невозможно. ")
                 else : 
-                    view.out("Вы ввели недопустимое значение. Осуществить поиск не получится. ")
+                    view.out("Вы ввели недопустимое значение. Поиск не состоится. ")
 
             case global_data.EDIT: 
                 to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите редактировать?", "1 - если  знаете", 

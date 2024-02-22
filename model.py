@@ -3,6 +3,7 @@ from tabulate import tabulate
 from dateutil.parser import parse
 
 import global_data
+
 import view
 
 TYPE_CONVERSION_ERROR = "Модуль model.py\n\tОшибка формата файла базы данных: невозможно преобразовать к нужному типу"
@@ -123,22 +124,39 @@ def get_note_by_fragment(fragment_to_find) :
     result = global_data.int_db_structure[ind] if ind != -1 else []
     return result
 
-# Метод ищет в списке заметок заметки, созданные в определенную дату, и возвращает список их индексов.
-# Если таких заметок нет, возвращает пустой список
-def get_ind_of_note_with_date(date_to_find) : 
-    result = []
-    for i in range(len(global_data.int_db_structure)) : 
-        print(parse(global_data.int_db_structure[i][3]).date())
-        if parse(global_data.int_db_structure[i][3]).date() == date_to_find.date() :
-            result.append(i)
-    return result
+# Метод ищет в списке заметок заметки, созданные в определенную дату, и возвращает: 
+#   0 - если метод сработал без ошибок
+#   -1 - если в процессе его выполнения возникла ошибка распознавания введенной пользователем даты
+# Результат поиска - список индексов - помещается в глобальную переменную global_data.result_list
 
-# Метод ищет заметки по фрагменту
-# Возвращает их список или пустой список, если таких заметок нет в базе   
+def get_ind_of_note_with_date(date_to_find) : 
+    global_data.result_list = []
+    for i in range(len(global_data.int_db_structure)) : 
+        try :
+            # print(parse(global_data.int_db_structure[i][3]).date())
+            if parse(global_data.int_db_structure[i][3]).date() == parse(date_to_find).date() :
+                global_data.result_list.append(i)
+        except : 
+            view.out("!!! ОШИБКА ВВОДА !!! Введенная строка не может быть распознана как дата.")
+            global_data.result_list = []
+            return -1
+    return 0
+
+# Метод помещает в глобальную переменную global_data.result_list 
+# заметки, созданные в указанную пользователем дату. 
+# Возвращает: 
+#   0 - если метод сработал без ошибок
+#   -1 - если в процессе его выполнения возникла ошибка распознавания введенной пользователем даты
+# Результат поиска - список найденных заметок - помещается в глобальную переменную global_data.result_list
+ 
 def get_notes_by_date(date_to_find) : 
     result = []
-    inds = get_ind_of_note_with_date(date_to_find)
-    for i in inds : 
-        result.append(global_data.int_db_structure[i])
-    return result
+    if get_ind_of_note_with_date(date_to_find) == 0 : 
+        inds = global_data.result_list
+        for i in inds : 
+            result.append(global_data.int_db_structure[i])
+        global_data.result_list = result
+        return 0
+    else : 
+        return -1
 
