@@ -88,10 +88,12 @@ def run() :
             case global_data.FIND: 
                 user_choice = view.string_input(global_data.SEARCH_OPTIONS)
                 if user_choice == global_data.SEARCH_BY_ID: 
-                    id_to_show = view.int_input("Введите ID заметки:\n ===> ")
-                    note_to_show = model.get_note_by_id(id_to_show)
-                    if note_to_show != [] : 
-                        view.print_note(model.note_for_print(note_to_show))
+                    id_to_show = view.id_input("Введите ID заметки:\n ===> ")
+                    if id_to_show != global_data.FAIL :
+                        note_to_show = model.get_note_by_id(id_to_show)
+                        if note_to_show != [] : 
+                            view.out("Найдена заметка: \n")
+                            view.print_note(model.note_for_print(note_to_show))
                     else : 
                         view.out("Заметки с таким ID нет в базе.")
 
@@ -99,6 +101,7 @@ def run() :
                     header_to_find = view.string_input("Введите название заметки \n(если точно не помните, лучше искать по фрагменту):\n ===> ")
                     note_to_show = model.get_note_by_header(header_to_find)
                     if note_to_show != [] : 
+                        view.out("Найдена заметка: \n")
                         view.print_note(model.note_for_print(note_to_show))
                     else : 
                         view.out("Заметки с таким названием нет в базе.")

@@ -70,7 +70,6 @@ def get_ind_of_note_with_id(id) :
     for i in range(len(global_data.int_db_structure)) : 
         if int(global_data.int_db_structure[i][0]) == id : 
             ind = i
-    print(f"Искомый индекс заметки равен {ind}")
     return ind
 
 # Метод удаляет из списка заметку с ID=id_to_delete
@@ -85,7 +84,7 @@ def remove_note_with_id(id_to_delete) :
         global_data.int_db_structure.remove(global_data.int_db_structure[ind])
         return 0
 
-# Метод ищет заметку по ее ID
+# Метод ищет заметку по ее ID (корректность ID проверяется в методе view.)
 # Возвращает ее копию или пустой список, если такой заметки нет в базе   
 def get_note_by_id(id_to_show) : 
     ind = get_ind_of_note_with_id(id_to_show)
@@ -137,7 +136,7 @@ def get_ind_of_note_with_date(date_to_find) :
             if parse(global_data.int_db_structure[i][3]).date() == parse(date_to_find).date() :
                 global_data.result_list.append(i)
         except : 
-            view.out("!!! ОШИБКА ВВОДА !!! Введенная строка не может быть распознана как дата.")
+            view.out("\n!!! ОШИБКА ВВОДА !!! Введенная строка не может быть распознана как дата.")
             global_data.result_list = []
             return -1
     return 0
