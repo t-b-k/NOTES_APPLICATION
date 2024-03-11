@@ -38,7 +38,7 @@ MAIN_MENU = """\n***************************************************************
                                      Выберите действие: """+ "\n" + COMMANDS_LIST + """
 **********************************************************************************************************\n"""
 MENU = 'm'
-READ = 'r'
+# READ = 'r'
 LIST = 'l'
 ADD = 'a'
 EDIT = 'e'
@@ -77,18 +77,21 @@ ILLEGAL_PATH_FORMAT = "Модуль csv_db_connect.py\n\t!!! Введен нек
 ILLEGAL_FILE_NAME = "Модуль csv_db_connect.py\n\t!!! Введенное имя файла содержит недопустимые символы !!!\n"
 NO_SUCH_DIRECTORY = "!!! КАТАЛОГ С ТАКИМ ИМЕНЕМ ОТСУТСТВУЕТ !!! "
 FILE_EXISTS = "!!! ФАЙЛ С ТАКИМ ИМЕНЕМ уже СУЩЕСТВУЕТ !!! "
+SUCH_FILE_DOES_NOT_EXIST = "Такого файла не существует. " 
+NEW_FILE_WILL_BE_CREATED = "Будет создан новый файл. "
 INVALID_INPUT = "!!! ВВЕДЕНО НЕДОПУСТИМОЕ ЗНАЧЕНИЕ !!! "
 WRITE_TO_FILE_ERROR = "!!! НЕ УДАЛОСЬ ЗАПИСАТЬ ДАННЫЕ В ФАЙЛ !!! "
 PROGRAM_IS_FINISHING = "ПРОГРАММА ЗАВЕРШАЕТ РАБОТУ... "
 READING_ERROR = "!!! ОШИБКА ЧТЕНИЯ ДАННЫХ !!!\n"
 INVALID_FILE_OR_PATH_NAME = "!!! НЕКОРРЕКТНОЕ ИМЯ ИЛИ ПУТЬ К ФАЙЛУ !!!"
+ILLEGAL_EXTENTION = "!!! НЕДОПУСТИМЫЙ ТИП ФАЙЛА. Программа предназначена для работы только с .csv-файлами !!! "
 
 # КОНСТАНТЫ ДЛЯ ОБОЗНАЧЕНИЯ УСПЕХА/НЕУДАЧИ ИСПОЛНЕНИЯ МЕТОДА
 SUCCESS = 0
 FAIL = -1
 FLAGS = {"Wrong file structure":1, "Illegal note ID":2, "Negative note ID":3, 
          "Wrong date/time format":4, "Not all IDs are unique":5, 
-         "Source file is empty":6}
+         "Source file is empty":6, "Not \".csv\"-extention":7, "Illegal path or file name":8}
 
 # КОНСТАНТЫ ДЛЯ РАБОТЫ С ФАЙЛАМИ: 
 EXISTING_FILE = 1

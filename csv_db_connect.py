@@ -155,7 +155,7 @@ def get_name_of_existing_csv_file () :
     # print("os.path.exists(user_input) = {}\n".format(os.path.exists(user_input)))
     # print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(user_input)))
     if os.path.exists(Path(user_input)) and os.path.isfile(Path(user_input)) : 
-        print("Пользователь ввел имя файла с расширением: {}".format(os.path.splitext(user_input)))
+        print("Пользователь ввел имя файла с расширением: {}".format(os.path.splitext(user_input)[1]))
         if os.path.splitext(Path(user_input))[1] != ".csv" : 
              view.out("\nИзвините, но данная программа предназначена для работы только с файлами .csv\n")
              user_input = ""
@@ -165,29 +165,36 @@ def get_name_of_existing_csv_file () :
     return user_input
 
 # Функция запрашивает у пользователя имя файла для записи в него результатов. 
-# Возвращает введенное пользователем имя, если соответствующий каталог существует и указано расширение .csv
-# В противном случае будет возвращена пустая строка
+# Возвращает кортеж: 
+# (<Флаг из global_data.FLAGS>, <Полное имя файла с расширением ".csv", 
+# соответствующий каталог существует и файл имеет расширение ".csv, или пустая строка (в противном случае)>)
+# Если пользователь не ввел расширение, оно будет добавлено автоматически. 
 
 def get_name_of_dest_csv_file () : 
-    user_input = view.string_input("\nВведите имя файла c расширением .csv, в который хотите записать данные: ")
-    # view.out(user_input)
+    empty_string = ""
+    user_input = view.string_input("\nВведите имя файла c расширением \".csv\", в который хотите записать данные.\n"+
+                                   "Если будет введено имя без расширения, оно автоматически будет дополнено расширением \".csv\" ===> ")
+    view.out(user_input)
+    print(user_input.find("."))
+    if user_input.find(".") != -1 : 
+        if not user_input.endswith(".csv") : 
+            return (global_data.FLAGS["Not \".csv\"-extention"], empty_string)
+    else : 
+        user_input = "".join([user_input, ".csv"])
+        print("user_input = {}\n".format(user_input))
     try : 
         path_name = os.path.dirname(user_input)
         file_name = os.path.basename(user_input)
     except : 
-        view.out(global_data.INVALID_FILE_OR_PATH_NAME)
-        return ""
-    # Если такой каталог существует и введенное пользователем имя файла заканчивается на ".csv" : 
-    if file_name.endswith(".csv") : 
-        if os.path.exists(os.path.dirname(Path(path_name))) and os.path.dirname(Path(path_name)) != '': 
-            return user_input
-        elif os.path.dirname(Path(path_name)) == '' : 
-            return os.path.join(os.getcwd(), file_name)
-        else : 
-            return ""
+        # view.out(global_data.INVALID_FILE_OR_PATH_NAME)
+        return (global_data.FLAGS["Illegal path or file name"], empty_string)
+    
+    if os.path.exists(os.path.dirname(Path(path_name))) and os.path.dirname(Path(path_name)) != '': 
+        return (global_data.SUCCESS, user_input)
+    elif os.path.dirname(Path(path_name)) == '' : 
+        return (global_data.SUCCESS, os.path.join(os.getcwd(), file_name))
     else : 
-        view.out("Введенное Вами имя файла имеет расширение, отличное от \".csv\"")
-        return ""
+        return (global_data.FLAGS["Illegal path or file name"], empty_string)
 
 # print(f"Файл с именем {global_data.data_base_name} существует." if db_file_exists(global_data.data_base_name) 
 #       else f"Файла с именем {global_data.data_base_name} не существует.")
@@ -229,14 +236,22 @@ def write_changes_to_file (file_name, mode='w') :
 # Запись изменений в другой файл с расширением .csv
 # Возвращаем имя файла, в который была произведена запись, или пустую строку в случае неудачи
 def write_changes_to_another_csv_file () : 
-    file_to_write = get_name_of_dest_csv_file ()
+    empty_string = ""
+    flag, file_to_write = get_name_of_dest_csv_file ()
+    if flag == global_data.FLAGS["Not \".csv\"-extention"] : 
+        view.out(global_data.ILLEGAL_EXTENTION)
+        return global_data.FAIL, empty_string
+    elif flag == global_data.FLAGS["Illegal path or file name"] : 
+        view.out(global_data.INVALID_FILE_OR_PATH_NAME)
+        return global_data.FAIL, empty_string
+    # else : 
     # print(file_to_write)
-    if file_to_write == "" : 
-        view.out("\n !!! Некорректное имя .csv-файла. Записать изменения в файл не удалось. !!!")
-        print("os.path.exists(os.path.dirname(user_input)) = {}".format(os.path.exists(os.path.dirname(file_to_write))))
-        print("os.path.exists(user_input) = {}\n".format(os.path.exists(file_to_write)))
-        print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(file_to_write)))
-        return ""
+    # if file_to_write == "" : 
+    #     view.out("\n !!! Некорректное имя .csv-файла. Записать изменения в файл не удалось. !!!")
+    #     print("os.path.exists(os.path.dirname(user_input)) = {}".format(os.path.exists(os.path.dirname(file_to_write))))
+    #     print("os.path.exists(user_input) = {}\n".format(os.path.exists(file_to_write)))
+    #     print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(file_to_write)))
+    #     return ""
 
     # Если файл с введенным именем уже существует: 
     if os.path.exists(Path(file_to_write)) :  
@@ -245,15 +260,14 @@ def write_changes_to_another_csv_file () :
         view.out("поскольку он может иметь неправильный формат. Выбирайте дозапись, только если уверены, что файл отформатирован правильно. ")
         user_choice = view.choice_of_two("Перезаписываем файл или дописываем в конец? ", "1 - перезаписываем", "2 - дописываем в конец")
         if user_choice == global_data.REWRITE : 
-            return write_changes_to_file(file_to_write)
+            return write_changes_to_file(file_to_write), file_to_write
             
         elif user_choice == global_data.APPEND : 
-            return write_changes_to_file(file_to_write, 'a')
+            return write_changes_to_file(file_to_write, 'a'), file_to_write
 
         else : 
             view.out("Вы ввели некорректное значение. Завершить операцию не получится. ")
-            return -1
+            return global_data.FAIL, empty_string
     else : 
-        view.out("\nФайла с таким именем не существует. Будет создан новый файл. ")
-        write_changes_to_file(file_to_write)
-        return file_to_write
+        view.out(global_data.SUCH_FILE_DOES_NOT_EXIST+global_data.NEW_FILE_WILL_BE_CREATED)
+        return write_changes_to_file(file_to_write), file_to_write

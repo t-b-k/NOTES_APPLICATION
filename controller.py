@@ -178,18 +178,18 @@ def run() :
                     view.out(f"\nЗапись в файл {global_data.data_base_name} прошла успешно")
 
             case global_data.SAVE_DATA_TO_ANOTHER_FILE: 
-                destination_file = csv_db_connect.write_changes_to_another_csv_file()
-                if destination_file == '' :
+                flag, file_name = csv_db_connect.write_changes_to_another_csv_file()
+                if flag == global_data.FAIL :
                     view.out("Не удалось выполнить запись в файл")
                 else : 
-                    view.out(f"\nЗапись в файл {destination_file} прошла успешно")
-            
+                    view.out(f"\nЗапись в файл {file_name} прошла успешно")
+
             case global_data.READ_DATA_FROM_FILE : 
                 new_file_name = csv_db_connect.get_name_of_existing_csv_file()
                 if new_file_name == "" : 
                     view.out("Вы ввели имя несуществующего файла, перейти к другой базе заметок не получится.")
                 else : 
-                    result_of_reading = model.read_data_from_csv(new_file_name)
+                    result_of_reading = model.read_data_from_csv(new_file_name)[1]
                     if len(result_of_reading) == 0 : 
                         answer = view.choice_of_two("Данный файл пуст. Вы хотите продолжить с ним работу? ", "1 - Да, хочу", "2 - Нет, не хочу")
                         if answer == 1 : 
