@@ -17,54 +17,56 @@ import view
 # int_db_structure = []
 # В глобальной переменной next_ID содержится следующий по порядку незадействованный идентификатор заметки
 # next_ID = 1
-# Метод возвращает кортеж: 
-
+# Метод возвращает кортеж result: 
+#   - цифровой результат операции - код ошибки - result[0]
+#   - список заметок (списков строковых полей) - result[1]
 
 def read_data_from_csv (csv_file_name) : 
     # global int_db_structure, next_ID
     empty_list = []
+    # result = (global_data.FAIL, empty_list) # По умолчанию - неудача
     try :
-        data = open(csv_file_name, 'r', encoding = 'utf-8')
+        file_with_data = open(csv_file_name, 'r', encoding = 'utf-8')
     except: 
-        view.out("!!! ОШИБКА ЧТЕНИЯ ДАННЫХ. Метод read_data_from_csv(file_name) из модуля model.py !!!")
-        return (global_data.FAIL, empty_list)
-    list_of_notes = [[*string.split(sep=";")[0:]] for string in data.readlines()]
-    
+        view.out(global_data.READ_FROM_FILE_ERROR)
+        return global_data.FAIL, empty_list
+    list_of_notes = [[*string.split(sep=";")[0:]] for string in file_with_data.readlines()]
+
     # if len(list_of_notes) == 0 : 
     #     view.out(FILE_WITH_NOTES_IS_EMPTY)
     #     return (global_data.FLAGS["Source file is empty"], empty_list)
+
     # Прочитали из файла список списков строк
     for next_note in list_of_notes : 
         # Если какой-то из списков содержит не 4 строки, то это не заметка:
         if len(next_note) != 4 : 
             view.out(global_data.WRONG_FIELDS_QTY)
-            return (global_data.FLAGS["Wrong file structure"], empty_list)
+            return global_data.FLAGS["Wrong file structure"], empty_list
         try : 
             next_note[0] = str(int(next_note[0])) # преобразовали строку с ID заметки в целое, и затем обратно в строку (для удобства 
                                         # вывода в консоль лучше все хранить в строковом формате)
         except : 
             view.out(global_data.ILLEGAL_NOTE_ID)
-            return (global_data.FLAGS["Illegal note ID"], empty_list)
+            return global_data.FLAGS["Illegal note ID"], empty_list
         if int(next_note[0]) <= 0 : 
             view.out(global_data.NEGATIVE_NOTE_ID)
-            return (global_data.FLAGS["Negative note ID"], empty_list)
+            return global_data.FLAGS["Negative note ID"], empty_list
         try : 
             next_note[3] = parse(next_note[3]).strftime("%d-%m-%Y %H:%M:%S") # преобразовали строку в дату/время и затем  - 
                                                                     # в строку формата dd-mm-YY HH:MM:SS
         except : 
             view.out(global_data.DATE_TIME_PARSING_ERROR)
-            return (global_data.FLAGS["Wrong date/time format"], empty_list)
-    
+            return global_data.FLAGS["Wrong date/time format"], empty_list
+
     if not all_IDs_are_different(list_of_notes) : 
         view.out(global_data.NOT_UNIQUE_IDS_ERROR)
-        return (global_data.FLAGS["Not all IDs are unique"], empty_list)
+        return global_data.FLAGS["Not all IDs are unique"], empty_list
     
-    print("ВОТ СПИСОК ЗАМЕТОК, содержащихся в базе данных: ")
+    print("ВОТ ЗАМЕТКИ, СОДЕРЖАЩИЕСЯ В НАСТОЯЩИЙ МОМЕНТ В ФАЙЛЕ {}: ".format(csv_file_name))
     print(list_of_notes)
 
-    data.close()
-    # next_ID = get_next_ID(list_of_notes)
-    return (global_data.SUCCESS, list_of_notes)
+    file_with_data.close()
+    return global_data.SUCCESS, list_of_notes
 
 def all_IDs_are_different(list_of_notes) : 
     set_of_indexes = set([note[0] for note in list_of_notes])
@@ -91,7 +93,7 @@ def note_for_print (note) :
 # Метод ищет в списке заметок заметку с ID=id и возвращает ее индекс.
 # Если такой заметки нет, возвращает -1
 def get_ind_of_note_with_id(id) : 
-    ind = -1
+    ind = global_data.FAIL
     for i in range(len(global_data.int_db_structure)) : 
         if int(global_data.int_db_structure[i][0]) == id : 
             ind = i
@@ -99,15 +101,20 @@ def get_ind_of_note_with_id(id) :
 
 # Метод удаляет из списка заметку с ID=id_to_delete
 # Возвращает: 
-# 0, если такая заметка найдена и удалена
-# -1 - если такой заметки не обнаружено
+# 0, если такая заметка найдена и удалена, и удаленную заметку
+# -1 - если такой заметки не обнаружено, и пустой список
 def remove_note_with_id(id_to_delete) : 
     ind = get_ind_of_note_with_id(id_to_delete)
+    print(f"Индекс заметки с ID = {id_to_delete} равен {ind}")
     if ind == global_data.FAIL : 
-        return global_data.FAIL
+        return global_data.FAIL, []
     else : 
-        global_data.int_db_structure.remove(global_data.int_db_structure[ind])
-        return global_data.SUCCESS
+        view.out("Удаляем заметку: ")
+        view.print_note(note_for_print(global_data.int_db_structure[ind]))
+        removed_note = global_data.int_db_structure.pop(ind)
+        view.out("Итоговый список заметок: ")
+        view.print_all_notes()
+        return global_data.SUCCESS, removed_note
 
 # Метод ищет заметку по ее ID (корректность ID проверяется в методе view.)
 # Возвращает ее копию или пустой список, если такой заметки нет в базе   
@@ -154,21 +161,23 @@ def get_notes_by_fragment(fragment_to_find) :
     
 
 # Метод ищет в списке заметок заметки, созданные в определенную дату, и возвращает кортеж: 
-#   (0, global_data.FAIL - если метод сработал без ошибок
-#   (-1, []) - если в процессе выполнения возникла ошибка распознавания какой-либо даты
+# (-1, <пустой список>) - если строка date_to_find не поддается преобразованию в дату
+# (0, <список найденных записей>) - если строка date_to_find успешно преобразована в дату
 
 def get_inds_of_notes_with_date(date_to_find) : 
     result_list = []
-    for i in range(len(global_data.int_db_structure)) : 
-        try :
-            # print(parse(global_data.int_db_structure[i][3]).date())
-            if parse(global_data.int_db_structure[i][3]).date() == parse(date_to_find).date() :
-                result_list.append(i)
-        except : 
-            view.out("\n!!! ОШИБКА ФОРМАТА ДАННЫХ !!! Строка не может быть распознана как дата.")
+    flag = global_data.FAIL
+    try : 
+        parse(date_to_find).date()
+    except : 
+            view.out(global_data.STRING_CAN_NOT_BE_PARSED_TO_DATE)
             result_list = []
-            return (global_data.FAIL, result_list)
-    return (global_data.SUCCESS, result_list)
+            return (flag, result_list)
+    for i in range(len(global_data.int_db_structure)) : 
+        if parse(global_data.int_db_structure[i][3]).date() == parse(date_to_find).date() :
+            result_list.append(i)
+    flag = global_data.SUCCESS
+    return (flag, result_list)
 
 # Метод возвращает кортеж: 
 #   (0, <Список найденных заметок>) - если метод сработал без ошибок

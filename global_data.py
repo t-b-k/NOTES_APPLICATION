@@ -71,18 +71,27 @@ FILE_WITH_NOTES_IS_EMPTY = "!!! ОБРАТИТЕ ВНИМАНИЕ, ЧТО ВЫБ
 ILLEGAL_NOTE_ID = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: недопустимый идентификатор заметки !!!\n"
 NEGATIVE_NOTE_ID = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: отрицательный идентификатор заметки !!!\n"
 DATE_TIME_PARSING_ERROR = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: невозможно распознать дату/время !!!\n"
+STRING_CAN_NOT_BE_PARSED_TO_DATE = "!!! НЕВОЗМОЖНО ПРЕОБРАЗОВАТЬ СТРОКУ В ДАТУ !!!"
 NOT_UNIQUE_IDS_ERROR = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: неуникальные идентификаторы заметок !!!\n"
 WRONG_FIELDS_QTY = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: неверное количество полей в заметке !!!\n"
 ILLEGAL_PATH_FORMAT = "Модуль csv_db_connect.py\n\t!!! Введен некорректный путь к файлу !!!\n"
 ILLEGAL_FILE_NAME = "Модуль csv_db_connect.py\n\t!!! Введенное имя файла содержит недопустимые символы !!!\n"
 NO_SUCH_DIRECTORY = "!!! КАТАЛОГ С ТАКИМ ИМЕНЕМ ОТСУТСТВУЕТ !!! "
+NO_SUCH_NOTE = "!!! ТАКОЙ ЗАМЕТКИ НЕТ !!!"
+NO_SUCH_NOTES = "!!! ТАКИХ ЗАМЕТОК НЕТ !!!"
 FILE_EXISTS = "!!! ФАЙЛ С ТАКИМ ИМЕНЕМ уже СУЩЕСТВУЕТ !!! "
 SUCH_FILE_DOES_NOT_EXIST = "Такого файла не существует. " 
 NEW_FILE_WILL_BE_CREATED = "Будет создан новый файл. "
+LIST_OF_NOTES_IS_EMPTY = "!!! СПИСОК ЗАМЕТОК ПУСТ !!!"
 INVALID_INPUT = "!!! ВВЕДЕНО НЕДОПУСТИМОЕ ЗНАЧЕНИЕ !!! "
+INVALID_COMMAND_TRY_AGAIN = "Недопустимая команда. Попробуйте еще раз!"
+EMPTY_STRING_IS_INPUT = "Введена пустая строка"
+NOTE_WILL_STAY_UNCHANGED = "Заметка останется без изменений"
+SEARCH_WILL_NOT_BE_PERFORMED = "Поиск не состоится"
 WRITE_TO_FILE_ERROR = "!!! НЕ УДАЛОСЬ ЗАПИСАТЬ ДАННЫЕ В ФАЙЛ !!! "
 PROGRAM_IS_FINISHING = "ПРОГРАММА ЗАВЕРШАЕТ РАБОТУ... "
 READING_ERROR = "!!! ОШИБКА ЧТЕНИЯ ДАННЫХ !!!\n"
+READ_FROM_FILE_ERROR = "!!!НЕВОЗМОЖНО ПРОЧИТАТЬ ФАЙЛ !!!\n"
 INVALID_FILE_OR_PATH_NAME = "!!! НЕКОРРЕКТНОЕ ИМЯ ИЛИ ПУТЬ К ФАЙЛУ !!!"
 ILLEGAL_EXTENTION = "!!! НЕДОПУСТИМЫЙ ТИП ФАЙЛА. Программа предназначена для работы только с .csv-файлами !!! "
 
@@ -91,9 +100,10 @@ SUCCESS = 0
 FAIL = -1
 FLAGS = {"Wrong file structure":1, "Illegal note ID":2, "Negative note ID":3, 
          "Wrong date/time format":4, "Not all IDs are unique":5, 
-         "Source file is empty":6, "Not \".csv\"-extention":7, "Illegal path or file name":8}
+         "Source file is empty":6, "Not \".csv\"-extention":7, "Illegal path or file name":8,
+         "Illegal file name":9}
 
-# КОНСТАНТЫ ДЛЯ РАБОТЫ С ФАЙЛАМИ: 
+# КОНСТАНТЫ ДЛЯ РАБОТЫ С ПОЛЬЗОВАТЕЛЬСКИМ ВЫБОРОМ: 
 EXISTING_FILE = 1
 NEW_FILE = 2
 DEFAULT_FILE_NAME = 1
@@ -102,6 +112,12 @@ WORKING_DIRECTORY = 1
 OTHER_DIRECTORY = 2
 REWRITE = 1
 APPEND = 2
+YES = 1
+NO = 2
+
+# СТРОКОВЫЕ КОНСТАНТЫ
+SEARCH_RESULT = "\nРезультат поиска: \n"
+FOUND_NOTE = "Найдена заметка: \n"
 
 # В глобальной переменной data_base_name хранится имя .csv-файла, с которым мы работаем в данном сеансе
 data_base_name = ""

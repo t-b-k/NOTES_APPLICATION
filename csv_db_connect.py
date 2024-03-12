@@ -176,26 +176,30 @@ def get_name_of_dest_csv_file () :
                                    "Если будет введено имя без расширения, оно автоматически будет дополнено расширением \".csv\" ===> ")
     view.out(user_input)
     print(user_input.find("."))
-    if user_input.find(".") != -1 : 
+    if user_input.find(".") != global_data.FAIL : 
         if not user_input.endswith(".csv") : 
             return (global_data.FLAGS["Not \".csv\"-extention"], empty_string)
     else : 
-        user_input = "".join([user_input, ".csv"])
-        print("user_input = {}\n".format(user_input))
-    try : 
-        path_name = os.path.dirname(user_input)
-        file_name = os.path.basename(user_input)
-    except : 
-        # view.out(global_data.INVALID_FILE_OR_PATH_NAME)
-        return (global_data.FLAGS["Illegal path or file name"], empty_string)
+        if user_input != "" : 
+            user_input = "".join([user_input, ".csv"])
+            # ОТЛАДОЧНАЯ ПЕЧАТЬ
+            print("user_input = {}\n".format(user_input))
+            try : 
+                path_name = os.path.dirname(user_input)
+                file_name = os.path.basename(user_input)
+            except : 
+                # view.out(global_data.INVALID_FILE_OR_PATH_NAME)
+                return (global_data.FLAGS["Illegal path or file name"], empty_string)
     
-    if os.path.exists(os.path.dirname(Path(path_name))) and os.path.dirname(Path(path_name)) != '': 
-        return (global_data.SUCCESS, user_input)
-    elif os.path.dirname(Path(path_name)) == '' : 
-        return (global_data.SUCCESS, os.path.join(os.getcwd(), file_name))
-    else : 
-        return (global_data.FLAGS["Illegal path or file name"], empty_string)
-
+            if os.path.exists(os.path.dirname(Path(path_name))) and os.path.dirname(Path(path_name)) != '': 
+                return (global_data.SUCCESS, user_input)
+            elif os.path.dirname(Path(path_name)) == '' : 
+                return (global_data.SUCCESS, os.path.join(os.getcwd(), file_name))
+            else : 
+                return (global_data.FLAGS["Illegal path or file name"], empty_string)
+        else : 
+            return (global_data.FLAGS["Illegal file name"], empty_string)
+        
 # print(f"Файл с именем {global_data.data_base_name} существует." if db_file_exists(global_data.data_base_name) 
 #       else f"Файла с именем {global_data.data_base_name} не существует.")
 # print("А существует ли файл C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.t ?" , end = " - " )
