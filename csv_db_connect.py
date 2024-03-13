@@ -33,25 +33,30 @@ def db_init() :
         default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, 
                                               "{} - использовать файл по умолчанию".format(global_data.DEFAULT_FILE_NAME), 
                                               "{} - использовать другой файл".format(global_data.OTHER_FILE_NAME))
-        
+    ###################################################################################################    
         # Если пользователь хочет указать свой файл: 
         if default_or_other == global_data.OTHER_FILE_NAME : 
-            global_data.data_base_name = get_name_of_existing_csv_file()
-            if global_data.data_base_name == "" : 
-                view.out("Вы ввели имя несуществующего файла.")
+            is_ok, global_data.data_base_name = get_name_of_existing_csv_file()
+            if is_ok == global_data.FLAGS["Not .csv file"] : 
+                view.out(global_data.NOT_CSV_FILE)
+                return global_data.FAIL   # Это не .csv-файл
+            elif is_ok == global_data.FLAGS["Such file doesn't exist"] :
+                view.out(global_data.SUCH_FILE_DOES_NOT_EXIST)
                 return global_data.FAIL   # Такого файла не существует
             
         # Если пользователь ввел недопустимое значение: 
         elif default_or_other != global_data.DEFAULT_FILE_NAME : 
-            view.out("\nВы ввели недопустимое значение. Программа завершает работу... ")
+            view.out(global_data.INVALID_INPUT)
             return global_data.FAIL
         # В противном случае будет использоваться файл по умолчанию. 
     
     # Если пользователь хочет создать новый файл базы заметок: 
     elif new_or_existing == global_data.NEW_FILE : 
-        user_choice = view.choice_of_two("\nФайл с заметками следует создать в текущем каталоге? ", "1 - Да", "2 - Нет")
+        user_choice = view.choice_of_two("\nФайл с заметками следует создать в текущем каталоге? ", 
+                                         f"{global_data.YES} - Да", 
+                                         f"{global_data.NO} - Нет")
         if user_choice != global_data.WORKING_DIRECTORY and user_choice != global_data.OTHER_DIRECTORY : 
-            view.out("\nВы дали недопустимый ответ. Программа завершает работу... ")
+            view.out(global_data.INVALID_INPUT)
             return global_data.FAIL
         # Если хочет создать новый файл в каталоге, отличном от текущего рабочего: 
         elif  user_choice == global_data.OTHER_DIRECTORY :
@@ -62,7 +67,7 @@ def db_init() :
                 if db_path_name == "" : 
                     db_path_name = DEFAULT_PATH_TO_DATA_BASE
                 elif not os.path.exists(Path(db_path_name)) or not os.path.isdir(Path(db_path_name)): 
-                    view.out("\n"+global_data.NO_SUCH_DIRECTORY+global_data.PROGRAM_IS_FINISHING+"\n")
+                    view.out("\n"+global_data.NO_SUCH_DIRECTORY)
                     return global_data.FAIL
             except : 
                 view.out(global_data.ILLEGAL_PATH_FORMAT)
@@ -72,12 +77,16 @@ def db_init() :
             print(f"\nФайл для заметок будет создан в каталоге {DEFAULT_PATH_TO_DATA_BASE}")
 
         db_file_name = view.string_input("\nВведите имя нового файла заметок без расширения.\n"+
-                                                   "Расширение .csv будет присвоено автоматически: \n ===> ")
-        db_file_name = db_file_name + ".csv"
+                                        "Расширение .csv будет присвоено автоматически: \n ===> ")
+        if db_file_name.find(".") == -1 : 
+            db_file_name = db_file_name + ".csv"
+        elif not db_file_name.endswith(".csv") : 
+            view.out(global_data.NOT_CSV_FILE)
+            return global_data.FAIL   # Это не .csv-файл
         try : 
             global_data.data_base_name = os.path.join(db_path_name, db_file_name)
             if os.path.exists(Path(global_data.data_base_name)) : 
-                view.out("\n"+global_data.FILE_EXISTS+global_data.PROGRAM_IS_FINISHING+"\n")
+                view.out("\n"+global_data.FILE_EXISTS)
                 return global_data.FAIL
             else : 
                 with open(global_data.data_base_name, "x", encoding = "utf-8") as db: 
@@ -86,7 +95,7 @@ def db_init() :
             view.out(global_data.ILLEGAL_FILE_NAME)    
             return global_data.FAIL
     else : 
-        view.out("\n"+global_data.INVALID_INPUT+global_data.PROGRAM_IS_FINISHING+"\n")
+        view.out("\n"+global_data.INVALID_INPUT)
         return global_data.FAIL
         
     view.out("\nБД заметок {} готова к работе. Желаем приятной работы!\n".format(global_data.data_base_name))
@@ -147,22 +156,30 @@ def write_data_to_csv_file (name_of_file, list_of_list_of_strings) :
         line_to_write = line_to_write.join("\n")
         dest.write()
 
-# Метод запрашивает у пользователя имя .csv-файла и возвращает его в виде строки
+# Метод запрашивает у пользователя имя .csv-файла и возвращает:
+# код завершения операции и имя файла в виде строки, если ввод оказался успешным. Иначе - пустую строку. 
 
 def get_name_of_existing_csv_file () : 
-    user_input = view.string_input("\nВведите имя .csv-файла (включая расширение), с которым хотите работать: ")
+    flag = global_data.SUCCESS
+    user_input = view.string_input("\nВведите имя .csv-файла, с которым хотите работать: ")
+    # Если введенная пользователем строка не содержит точку => не указано расширение
+    if user_input.find('.') == -1 : 
+        # добавляем сами расширение ".csv"
+        user_input = ".".join([user_input, "csv"])
     # view.out(user_input)
     # print("os.path.exists(user_input) = {}\n".format(os.path.exists(user_input)))
     # print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(user_input)))
     if os.path.exists(Path(user_input)) and os.path.isfile(Path(user_input)) : 
-        print("Пользователь ввел имя файла с расширением: {}".format(os.path.splitext(user_input)[1]))
+        # print("Пользователь ввел имя файла с расширением: {}".format(os.path.splitext(user_input)[1]))
         if os.path.splitext(Path(user_input))[1] != ".csv" : 
-             view.out("\nИзвините, но данная программа предназначена для работы только с файлами .csv\n")
-             user_input = ""
+            # view.out("\nИзвините, но данная программа предназначена для работы только с файлами .csv\n")
+            user_input = ""
+            flag = global_data.FLAGS["Not .csv file"]
     else : 
-        view.out("\nФайла с таким именем не существует...")
+        # view.out("\nИзвините, но файла с таким именем не существует...")
         user_input = ""
-    return user_input
+        flag = global_data.FLAGS["Such file doesn't exist"]
+    return flag, user_input
 
 # Функция запрашивает у пользователя имя файла для записи в него результатов. 
 # Возвращает кортеж: 
@@ -174,8 +191,9 @@ def get_name_of_dest_csv_file () :
     empty_string = ""
     user_input = view.string_input("\nВведите имя файла c расширением \".csv\", в который хотите записать данные.\n"+
                                    "Если будет введено имя без расширения, оно автоматически будет дополнено расширением \".csv\" ===> ")
-    view.out(user_input)
-    print(user_input.find("."))
+    # ОТЛАДОЧНАЯ ПЕЧАТЬ
+    # view.out(user_input)
+    # print(user_input.find("."))
     if user_input.find(".") != global_data.FAIL : 
         if not user_input.endswith(".csv") : 
             return (global_data.FLAGS["Not \".csv\"-extention"], empty_string)
@@ -183,7 +201,7 @@ def get_name_of_dest_csv_file () :
         if user_input != "" : 
             user_input = "".join([user_input, ".csv"])
             # ОТЛАДОЧНАЯ ПЕЧАТЬ
-            print("user_input = {}\n".format(user_input))
+            # print("user_input = {}\n".format(user_input))
             try : 
                 path_name = os.path.dirname(user_input)
                 file_name = os.path.basename(user_input)
@@ -262,7 +280,9 @@ def write_changes_to_another_csv_file () :
         view.out("Вы ввели имя существующего файла. ")
         view.out("При дозаписи мы не гарантируем, что информация из этого файла сможет быть считана данной программой, ")
         view.out("поскольку он может иметь неправильный формат. Выбирайте дозапись, только если уверены, что файл отформатирован правильно. ")
-        user_choice = view.choice_of_two("Перезаписываем файл или дописываем в конец? ", "1 - перезаписываем", "2 - дописываем в конец")
+        user_choice = view.choice_of_two("Перезаписываем файл или дописываем в конец? ", 
+                                         f"{global_data.REWRITE} - перезаписываем", 
+                                         f"{global_data.APPEND} - дописываем в конец")
         if user_choice == global_data.REWRITE : 
             return write_changes_to_file(file_to_write), file_to_write
             

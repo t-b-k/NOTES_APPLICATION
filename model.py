@@ -62,8 +62,9 @@ def read_data_from_csv (csv_file_name) :
         view.out(global_data.NOT_UNIQUE_IDS_ERROR)
         return global_data.FLAGS["Not all IDs are unique"], empty_list
     
-    print("ВОТ ЗАМЕТКИ, СОДЕРЖАЩИЕСЯ В НАСТОЯЩИЙ МОМЕНТ В ФАЙЛЕ {}: ".format(csv_file_name))
-    print(list_of_notes)
+    # ОТЛАДОЧНАЯ ПЕЧАТЬ: 
+    # print("ВОТ ЗАМЕТКИ, СОДЕРЖАЩИЕСЯ В НАСТОЯЩИЙ МОМЕНТ В ФАЙЛЕ {}: ".format(csv_file_name))
+    # print(list_of_notes)
 
     file_with_data.close()
     return global_data.SUCCESS, list_of_notes
@@ -78,10 +79,11 @@ def get_next_ID (list_of_notes) :
 def add_note(header, text) : 
     # global next_ID, int_db_structure
     note = [str(global_data.next_ID), header, text, datetime.now().strftime("%d-%m-%Y %H:%M:%S")]
-    print(type(note))
-    print(f"Внутри метода add_note, перед добавлением заметки в list_of_notes ее длина равна {len(global_data.int_db_structure)}")
+    # ОТЛАДОЧНАЯ ПЕЧАТЬ
+    # print(type(note))
+    # print(f"Внутри метода add_note, перед добавлением заметки в list_of_notes ее длина равна {len(global_data.int_db_structure)}")
     global_data.int_db_structure.append(note)
-    print(f"Внутри метода add_note, после добавления заметки в list_of_notes ее длина равна {len(global_data.int_db_structure)}")
+    #print(f"Внутри метода add_note, после добавления заметки в list_of_notes ее длина равна {len(global_data.int_db_structure)}")
     # next_ID += 1
     return global_data.int_db_structure[-1]
 
@@ -104,16 +106,20 @@ def get_ind_of_note_with_id(id) :
 # 0, если такая заметка найдена и удалена, и удаленную заметку
 # -1 - если такой заметки не обнаружено, и пустой список
 def remove_note_with_id(id_to_delete) : 
+    empty_note = []
     ind = get_ind_of_note_with_id(id_to_delete)
-    print(f"Индекс заметки с ID = {id_to_delete} равен {ind}")
+    # ОТЛАДОЧНАЯ ПЕЧАТЬ: 
+    # print(f"Индекс заметки с ID = {id_to_delete} равен {ind}")
     if ind == global_data.FAIL : 
-        return global_data.FAIL, []
+        return global_data.FAIL, empty_note
     else : 
-        view.out("Удаляем заметку: ")
-        view.print_note(note_for_print(global_data.int_db_structure[ind]))
+        # ОТЛАДОЧНАЯ ПЕЧАТЬ
+        # view.out("Удаляем заметку: ")
+        # view.print_note(note_for_print(global_data.int_db_structure[ind]))
         removed_note = global_data.int_db_structure.pop(ind)
-        view.out("Итоговый список заметок: ")
-        view.print_all_notes()
+        # ОТЛАДОЧНАЯ ПЕЧАТЬ: 
+        # view.out("Итоговый список заметок: ")
+        # view.print_all_notes()
         return global_data.SUCCESS, removed_note
 
 # Метод ищет заметку по ее ID (корректность ID проверяется в методе view.)

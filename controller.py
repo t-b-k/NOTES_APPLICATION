@@ -17,6 +17,7 @@ def run() :
     file_is_OK = csv_db_connect.db_init()
     
     if file_is_OK == global_data.FAIL: # Возникли проблемы с открытием/созданием файла, указанного пользователем
+        view.out(global_data.PROGRAM_IS_FINISHING)
         onward = False
     elif file_is_OK == 0 : # Файл с определен, надо проверить его на пустоту
         stat_result = os.stat(global_data.data_base_name)
@@ -26,7 +27,7 @@ def run() :
             if reading_attempt in global_data.FLAGS.values() : 
                 onward = False
             else : 
-                print("Вот исходное состояние файла, с которым Вы пожелали работать: \n")
+                print("Вот исходное состояние файла: \n")
                 view.print_all_notes()
                 global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
             # print("Считали данные из файла с заметками. ")
@@ -40,13 +41,13 @@ def run() :
     
     while onward : 
         view.out(global_data.MAIN_MENU)
-        action = view.string_input("  ===> ").lower()
+        action = view.string_input("  ===> ").strip().lower()
         match action :
             case global_data.MENU: 
                 view.out(global_data.COMMANDS_LIST)
 
             case global_data.LIST: 
-                print("--------------------------Вот все ваши заметки:-----------------------------\n")
+                # print("--------------------------Вот все ваши заметки:-----------------------------\n")
                 view.print_all_notes()
 
             case global_data.ADD: 
@@ -121,8 +122,8 @@ def run() :
                     
             case global_data.EDIT: 
                 if not len(global_data.int_db_structure) == 0 : 
-                    to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите редактировать?", "1 - если  знаете", 
-                                   "2 - если вам надо просмотреть список заметок")
+                    to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите редактировать?", f"{global_data.YES} - если  знаете", 
+                                   f"{global_data.NO} - если вам надо просмотреть список заметок")
                     if to_do == global_data.YES or to_do == global_data.NO:
                         if to_do == global_data.NO : 
                             view.print_all_notes()
@@ -169,19 +170,19 @@ def run() :
             case global_data.DELETE: 
                 if len(global_data.int_db_structure) != 0 : 
                     to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите удалить?", 
-                                               "1 - если  знаете", 
-                                               "2 - если вам надо просмотреть список заметок")
+                                               f"{global_data.YES} - если  знаете", 
+                                               f"{global_data.NO} - если вам надо просмотреть список заметок")
                     if to_do == global_data.NO or to_do == global_data.YES:
                         if to_do == global_data.NO : 
                             view.print_all_notes()
                         id_to_delete = view.string_input("Введите ID заметки, которую хотите удалить:\n ===> ")
                         ind = model.get_ind_of_note_with_id(int(id_to_delete)) 
                         if ind == global_data.FAIL : 
-                            view.out("!!! Заметки с таким ID нет !!!")
+                            view.out(global_data.NOTE_WITH_SUCH_ID_IS_ABSENT)
                         else : 
                             view.out(f"Заметка с ID = {id_to_delete}:\n")
                             view.print_note(model.note_for_print(model.remove_note_with_id(int(id_to_delete))[1]))
-                            view.out("успешно удалена.")
+                            view.out("УСПЕШНО УДАЛЕНА")
                     else : 
                         view.out(global_data.INVALID_INPUT)
                 else : 
@@ -201,15 +202,17 @@ def run() :
                     view.out(f"\nЗапись в файл {file_name} прошла успешно")
 
             case global_data.READ_DATA_FROM_FILE : 
-                new_file_name = csv_db_connect.get_name_of_existing_csv_file()
-                if new_file_name == "" : 
+                result, new_file_name = csv_db_connect.get_name_of_existing_csv_file()
+                if result == global_data.FLAGS["Not .csv file"] : 
+                    view.out(global_data.NOT_CSV_FILE)
+                elif result == global_data.FLAGS["Such file doesn't exist"] : 
                     view.out(global_data.SUCH_FILE_DOES_NOT_EXIST)
                 else : 
                     flag_of_result, list_of_notes = model.read_data_from_csv(new_file_name)
                     if flag_of_result == 0 :
                         if len(list_of_notes) == 0 : 
                             answer = view.choice_of_two("Данный файл пуст. Вы хотите продолжить с ним работу? ", 
-                                                    "1 - Да, хочу", "2 - Нет, не хочу")
+                                                    f"{global_data.YES} - Да, хочу", f"{global_data.NO} - Нет, не хочу")
                             if answer == global_data.YES : 
                                 global_data.data_base_name = new_file_name
                                 global_data.int_db_structure = list_of_notes

@@ -34,9 +34,9 @@ COMMANDS_LIST = "\n".join(["{:66}{}".format("        m - Просмотреть 
         # r - Считать заметки из другого файла .csv
         # q - Выйти (без сохранения изменений)\n"""
 
-MAIN_MENU = """\n***********************************************************************************************************
-                                     Выберите действие: """+ "\n" + COMMANDS_LIST + """
-**********************************************************************************************************\n"""
+MAIN_MENU = "\n"+"*"*112+"\n"+" "*40+"Выберите действие:"+"\n"+COMMANDS_LIST+"\n"+"*"*112
+#                                      Выберите действие: """+ "\n" + COMMANDS_LIST + """
+# **********************************************************************************************************\n"""
 MENU = 'm'
 # READ = 'r'
 LIST = 'l'
@@ -76,20 +76,22 @@ NOT_UNIQUE_IDS_ERROR = "Модуль model.py\n\t!!! Ошибка формата
 WRONG_FIELDS_QTY = "Модуль model.py\n\t!!! Ошибка формата файла базы данных: неверное количество полей в заметке !!!\n"
 ILLEGAL_PATH_FORMAT = "Модуль csv_db_connect.py\n\t!!! Введен некорректный путь к файлу !!!\n"
 ILLEGAL_FILE_NAME = "Модуль csv_db_connect.py\n\t!!! Введенное имя файла содержит недопустимые символы !!!\n"
+NOT_CSV_FILE = "Данный файл не является .csv-файлом"
 NO_SUCH_DIRECTORY = "!!! КАТАЛОГ С ТАКИМ ИМЕНЕМ ОТСУТСТВУЕТ !!! "
 NO_SUCH_NOTE = "!!! ТАКОЙ ЗАМЕТКИ НЕТ !!!"
+NOTE_WITH_SUCH_ID_IS_ABSENT = "!!! ЗАМЕТКИ С ТАКИМ ID НЕТ В БАЗЕ !!!"
 NO_SUCH_NOTES = "!!! ТАКИХ ЗАМЕТОК НЕТ !!!"
 FILE_EXISTS = "!!! ФАЙЛ С ТАКИМ ИМЕНЕМ уже СУЩЕСТВУЕТ !!! "
 SUCH_FILE_DOES_NOT_EXIST = "Такого файла не существует. " 
 NEW_FILE_WILL_BE_CREATED = "Будет создан новый файл. "
 LIST_OF_NOTES_IS_EMPTY = "!!! СПИСОК ЗАМЕТОК ПУСТ !!!"
 INVALID_INPUT = "!!! ВВЕДЕНО НЕДОПУСТИМОЕ ЗНАЧЕНИЕ !!! "
+PROGRAM_IS_FINISHING = "\nПРОГРАММА ЗАВЕРШАЕТ СВОЮ РАБОТУ... "
 INVALID_COMMAND_TRY_AGAIN = "Недопустимая команда. Попробуйте еще раз!"
 EMPTY_STRING_IS_INPUT = "Введена пустая строка"
 NOTE_WILL_STAY_UNCHANGED = "Заметка останется без изменений"
 SEARCH_WILL_NOT_BE_PERFORMED = "Поиск не состоится"
 WRITE_TO_FILE_ERROR = "!!! НЕ УДАЛОСЬ ЗАПИСАТЬ ДАННЫЕ В ФАЙЛ !!! "
-PROGRAM_IS_FINISHING = "ПРОГРАММА ЗАВЕРШАЕТ РАБОТУ... "
 READING_ERROR = "!!! ОШИБКА ЧТЕНИЯ ДАННЫХ !!!\n"
 READ_FROM_FILE_ERROR = "!!!НЕВОЗМОЖНО ПРОЧИТАТЬ ФАЙЛ !!!\n"
 INVALID_FILE_OR_PATH_NAME = "!!! НЕКОРРЕКТНОЕ ИМЯ ИЛИ ПУТЬ К ФАЙЛУ !!!"
@@ -101,7 +103,7 @@ FAIL = -1
 FLAGS = {"Wrong file structure":1, "Illegal note ID":2, "Negative note ID":3, 
          "Wrong date/time format":4, "Not all IDs are unique":5, 
          "Source file is empty":6, "Not \".csv\"-extention":7, "Illegal path or file name":8,
-         "Illegal file name":9}
+         "Illegal file name":9, "Not .csv file":10, "Such file doesn't exist":11}
 
 # КОНСТАНТЫ ДЛЯ РАБОТЫ С ПОЛЬЗОВАТЕЛЬСКИМ ВЫБОРОМ: 
 EXISTING_FILE = 1
