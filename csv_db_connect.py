@@ -14,12 +14,10 @@ DEFAULT_PATH_TO_DATA_BASE = Path(os.getcwd())
 DEFAULT_DATA_FILE_NAME = "notes.csv"
 
 global_data.data_base_name = str(DEFAULT_PATH_TO_DATA_BASE.joinpath(DEFAULT_DATA_FILE_NAME))
-# print(global_data.data_base_name)
-# print(type(str(global_data.data_base_name)))
 
 # Метод db_init() возвращает: 
-#         0 - если файл заметок существует или вновь создан
-#        -1 - если файла не существует или с ним что-то не так, или пользователь не справился с вводом
+#         global_data.SUCCESS - если файл заметок существует или вновь создан
+#         global_data.FAIL - если файла не существует или с ним что-то не так, или пользователь не справился с вводом
 #     В результате выполнения данного метода присваивается значение глобальной переменной
 #     global_data.data_base_name
 
@@ -33,8 +31,8 @@ def db_init() :
         default_or_other = view.choice_of_two(DEFAULT_DB_NAME_MESSAGE, 
                                               "{} - использовать файл по умолчанию".format(global_data.DEFAULT_FILE_NAME), 
                                               "{} - использовать другой файл".format(global_data.OTHER_FILE_NAME))
-    ###################################################################################################    
-        # Если пользователь хочет указать свой файл: 
+
+        # Если пользователь хочет работать со своим файлом: 
         if default_or_other == global_data.OTHER_FILE_NAME : 
             is_ok, global_data.data_base_name = get_name_of_existing_csv_file()
             if is_ok == global_data.FLAGS["Not .csv file"] : 
@@ -48,7 +46,6 @@ def db_init() :
         elif default_or_other != global_data.DEFAULT_FILE_NAME : 
             view.out(global_data.INVALID_INPUT)
             return global_data.FAIL
-        # В противном случае будет использоваться файл по умолчанию. 
     
     # Если пользователь хочет создать новый файл базы заметок: 
     elif new_or_existing == global_data.NEW_FILE : 
@@ -101,49 +98,21 @@ def db_init() :
     view.out("\nБД заметок {} готова к работе. Желаем приятной работы!\n".format(global_data.data_base_name))
     return global_data.SUCCESS
 
-# Метод db_file_exists проверяет переданную в него строку на то, является ли она корректным 
-# полным именем существующего файла
-
-# def db_file_exists (full_file_name) : 
-#     if os.path.exists(full_file_name) : 
-#         print(f"Файл '{full_file_name}' существует")
-#         return True
-#     else : 
-#         print(f"Файл '{full_file_name}' не существует")
-#         return False
-
-
 # Метод db_file_is_csv определяет, является ли поданная на вход строка именем файла с расширением .csv
 # Возвращает Truе или False
 def db_file_is_csv (file_name) :
     base, ext = os.path.splitext(file_name)
-    print("Base:", base)
-    print("Extension:", ext)
     return ext[-4:].lower() == ".csv"
-
-    # return file_name[-4:].lower() == ".csv"
-
-# date_and_time = datetime.now()
-# d_and_t_in_str_format = str(date_and_time)
-# print(d_and_t_in_str_format)
-# print("Тип переменной d_and_t_in_str_format = {}".format(type(d_and_t_in_str_format)))
-# print("Тип переменной date_and_time = {}".format(type(date_and_time)))
-# print(str(date_and_time)[:16]) # Дата + время без секунд и миллисекунд
 
 # Метод чтения данных из .csv-файла с разделителем ';', возвращающий 
 # список списков, в котором каждый элемент вложенного списка является строкой. 
-# Предполагается, что .csv-файл не содержит заголовков, то есть в возвращаемой структуре 
+# Предполагается, что .csv-файл не содержит заголовков, то есть, в возвращаемой структуре 
 # "голые" данные
 def get_data (name_of_existing_csv_file) : 
     data = open(name_of_existing_csv_file, 'r', encoding = 'utf-8')
     list_of_lists_of_strings = [[*string.split(sep=";")[0:]] for string in data.readlines()]
     data.close()
     return list_of_lists_of_strings
-
-# Метод проверки содержимого реально существующего csv-файла на целостность: то есть, 
-# что он действительно представляет собой файл с заметками правильного формата
-
-
 
 # Метод записи данных из списка списков строк в .csv-файл с разделителем ';', возвращающий 
 # True - если запись прошла успешно; 
@@ -164,49 +133,38 @@ def get_name_of_existing_csv_file () :
     user_input = view.string_input("\nВведите имя .csv-файла, с которым хотите работать: ")
     # Если введенная пользователем строка не содержит точку => не указано расширение
     if user_input.find('.') == -1 : 
-        # добавляем сами расширение ".csv"
+        # => добавляем сами расширение ".csv"
         user_input = ".".join([user_input, "csv"])
-    # view.out(user_input)
-    # print("os.path.exists(user_input) = {}\n".format(os.path.exists(user_input)))
-    # print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(user_input)))
+
     if os.path.exists(Path(user_input)) and os.path.isfile(Path(user_input)) : 
-        # print("Пользователь ввел имя файла с расширением: {}".format(os.path.splitext(user_input)[1]))
         if os.path.splitext(Path(user_input))[1] != ".csv" : 
-            # view.out("\nИзвините, но данная программа предназначена для работы только с файлами .csv\n")
             user_input = ""
             flag = global_data.FLAGS["Not .csv file"]
     else : 
-        # view.out("\nИзвините, но файла с таким именем не существует...")
         user_input = ""
         flag = global_data.FLAGS["Such file doesn't exist"]
     return flag, user_input
 
-# Функция запрашивает у пользователя имя файла для записи в него результатов. 
+# Функция get_name_of_dest_csv_file () запрашивает у пользователя имя файла для записи в него результатов. 
 # Возвращает кортеж: 
-# (<Флаг из global_data.FLAGS>, <Полное имя файла с расширением ".csv", 
-# соответствующий каталог существует и файл имеет расширение ".csv, или пустая строка (в противном случае)>)
-# Если пользователь не ввел расширение, оно будет добавлено автоматически. 
+# (<Флаг из global_data.FLAGS>, <Полное имя файла с расширением ".csv", если соответствующий
+# каталог существует, и файл имеет расширение ".csv, или пустая строка (в противном случае)>)
+# Если пользователь не ввел расширение, расширение "".csv" будет добавлено автоматически. 
 
 def get_name_of_dest_csv_file () : 
     empty_string = ""
     user_input = view.string_input("\nВведите имя файла c расширением \".csv\", в который хотите записать данные.\n"+
                                    "Если будет введено имя без расширения, оно автоматически будет дополнено расширением \".csv\" ===> ")
-    # ОТЛАДОЧНАЯ ПЕЧАТЬ
-    # view.out(user_input)
-    # print(user_input.find("."))
     if user_input.find(".") != global_data.FAIL : 
         if not user_input.endswith(".csv") : 
             return (global_data.FLAGS["Not \".csv\"-extention"], empty_string)
     else : 
         if user_input != "" : 
             user_input = "".join([user_input, ".csv"])
-            # ОТЛАДОЧНАЯ ПЕЧАТЬ
-            # print("user_input = {}\n".format(user_input))
             try : 
                 path_name = os.path.dirname(user_input)
                 file_name = os.path.basename(user_input)
             except : 
-                # view.out(global_data.INVALID_FILE_OR_PATH_NAME)
                 return (global_data.FLAGS["Illegal path or file name"], empty_string)
     
             if os.path.exists(os.path.dirname(Path(path_name))) and os.path.dirname(Path(path_name)) != '': 
@@ -217,17 +175,6 @@ def get_name_of_dest_csv_file () :
                 return (global_data.FLAGS["Illegal path or file name"], empty_string)
         else : 
             return (global_data.FLAGS["Illegal file name"], empty_string)
-        
-# print(f"Файл с именем {global_data.data_base_name} существует." if db_file_exists(global_data.data_base_name) 
-#       else f"Файла с именем {global_data.data_base_name} не существует.")
-# print("А существует ли файл C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.t ?" , end = " - " )
-# print(db_file_exists("C:\\Users\\Татьяна Калашникова\\CODE\\Cheburashka.txt"))
-# print()
-# print("А является ли файл C:\\Users\\Татьяна Калашникова\\CODE\\NOTES_APPLICATION\Konkurs.csv csv-файлом?" , end = " - " )
-# print(db_file_is_csv(Path("Konkurs.csv")))
-
-# read_file_result = get_data (global_data.data_base_name)
-# print(type(read_file_result))
 
 # Запись изменений в исходный файл базы данных
 def write_changes_to_data_base () : 
@@ -239,7 +186,7 @@ def write_changes_to_data_base () :
             db.writelines(data_to_write)
         return global_data.SUCCESS
     except :
-        view.out(" !!! ОШИБКА ЗАПИСИ")    
+        view.out(global_data.WRITE_TO_FILE_ERROR)    
         return global_data.FAIL
 
 # Запись/дозапись изменений в заданный файл
@@ -266,15 +213,6 @@ def write_changes_to_another_csv_file () :
     elif flag == global_data.FLAGS["Illegal path or file name"] : 
         view.out(global_data.INVALID_FILE_OR_PATH_NAME)
         return global_data.FAIL, empty_string
-    # else : 
-    # print(file_to_write)
-    # if file_to_write == "" : 
-    #     view.out("\n !!! Некорректное имя .csv-файла. Записать изменения в файл не удалось. !!!")
-    #     print("os.path.exists(os.path.dirname(user_input)) = {}".format(os.path.exists(os.path.dirname(file_to_write))))
-    #     print("os.path.exists(user_input) = {}\n".format(os.path.exists(file_to_write)))
-    #     print("os.path.isfile(user_input) = {}\n".format(os.path.isfile(file_to_write)))
-    #     return ""
-
     # Если файл с введенным именем уже существует: 
     if os.path.exists(Path(file_to_write)) :  
         view.out("Вы ввели имя существующего файла. ")
@@ -290,8 +228,8 @@ def write_changes_to_another_csv_file () :
             return write_changes_to_file(file_to_write, 'a'), file_to_write
 
         else : 
-            view.out("Вы ввели некорректное значение. Завершить операцию не получится. ")
+            view.out(get_data.INVALID_INPUT + " " + global_data.OPERATION_CAN_NOT_BE_FINISHED)
             return global_data.FAIL, empty_string
     else : 
-        view.out(global_data.SUCH_FILE_DOES_NOT_EXIST+global_data.NEW_FILE_WILL_BE_CREATED)
+        view.out(global_data.SUCH_FILE_DOES_NOT_EXIST+ " " + global_data.NEW_FILE_WILL_BE_CREATED)
         return write_changes_to_file(file_to_write), file_to_write

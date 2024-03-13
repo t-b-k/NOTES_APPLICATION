@@ -8,10 +8,6 @@ import global_data
 import csv_db_connect
 
 def run() : 
-    # global int_db_structure
-    # global next_ID
-    # print(f"Модуль controller.py, метод run(), next_ID = {global_data.next_ID}")
-    # print(f"Модуль controller.py, метод run(), string 13. int_db_structure = \n{global_data.int_db_structure}\n")
     view.out(global_data.HELLO_MESSAGE)
     onward = True
     file_is_OK = csv_db_connect.db_init()
@@ -19,26 +15,22 @@ def run() :
     if file_is_OK == global_data.FAIL: # Возникли проблемы с открытием/созданием файла, указанного пользователем
         view.out(global_data.PROGRAM_IS_FINISHING)
         onward = False
-    elif file_is_OK == 0 : # Файл с определен, надо проверить его на пустоту
+    elif file_is_OK == global_data.SUCCESS : # Файл с определен, надо проверить его на пустоту
         stat_result = os.stat(global_data.data_base_name)
     #   если исходный файл базы данных не пуст:
         if stat_result.st_size != 0 : 
             reading_attempt, global_data.int_db_structure = model.read_data_from_csv(global_data.data_base_name)
-            if reading_attempt in global_data.FLAGS.values() : 
+            if reading_attempt == global_data.FAIL or reading_attempt in global_data.FLAGS.values() : 
                 onward = False
             else : 
-                print("Вот исходное состояние файла: \n")
+                print("Вот исходное состояние файла c заметками: \n")
                 view.print_all_notes()
                 global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
-            # print("Считали данные из файла с заметками. ")
-            # print(f"Модуль controller.py, метод run(), string 22. int_db_structure = \n{global_data.int_db_structure}\n")
-            # print(f"Модуль controller.py, метод run(), string 23. next_ID = {global_data.next_ID}")
-            # print(f"Количество заметок в исходном файле = {len(global_data.int_db_structure)}")
+            # Считали данные из файла с заметками.
         else: 
             view.out(global_data.FILE_WITH_NOTES_IS_EMPTY)
     
-    # Файл с заметками считан, можно приступать к работе. 
-    
+    # Файл с заметками считан, можно приступать к работе.     
     while onward : 
         view.out(global_data.MAIN_MENU)
         action = view.string_input("  ===> ").strip().lower()
@@ -47,30 +39,14 @@ def run() :
                 view.out(global_data.COMMANDS_LIST)
 
             case global_data.LIST: 
-                # print("--------------------------Вот все ваши заметки:-----------------------------\n")
                 view.print_all_notes()
 
             case global_data.ADD: 
                 note_data = request_note_data()
-                # print(f"Type of note_data = {type(note_data)}")
-                # print(note_data[0])
-                # print(note_data[1])
-                # print(f"Длина int_db_structure = {len(global_data.int_db_structure)}")
                 model.add_note(note_data[0], note_data[1])
                 global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
-                # print(f"Длина int_db_structure после выполнения метода add_note = {len(global_data.int_db_structure)}")
-                # print(f"Новый next_ID = {global_data.next_ID}")
-                #print(f"Type of added_note = {type(added_note)}")
-                #  used_ID = added_note[0]
                 view.out("В базу добавлена заметка c ID = {}:\n".format(global_data.next_ID-1))
-                # print("*************************************************************")
-                # print("Печать заметки как есть: ")
-                # print(global_data.int_db_structure[-1])
-                # print("Печать после преобразования в список строк: ")
                 view.print_note(model.note_for_print(global_data.int_db_structure[-1]))
-                #  print("Печать неподготовленной заметки: ")
-                #  view.print_note(global_data.int_db_structure[-1])
-                # view.print_all_notes()
 
             case global_data.FIND: 
                 if not len(global_data.int_db_structure) == 0 : 
@@ -122,29 +98,27 @@ def run() :
                     
             case global_data.EDIT: 
                 if not len(global_data.int_db_structure) == 0 : 
-                    to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите редактировать?", f"{global_data.YES} - если  знаете", 
-                                   f"{global_data.NO} - если вам надо просмотреть список заметок")
+                    to_do = view.choice_of_two("Вы знаете ID заметки, которую хотите редактировать?", 
+                                    f"{global_data.YES} - если  знаете", 
+                                    f"{global_data.NO} - если вам надо просмотреть список заметок")
                     if to_do == global_data.YES or to_do == global_data.NO:
                         if to_do == global_data.NO : 
                             view.print_all_notes()
                         id_to_modify = view.string_input("Введите ID заметки, в которую хотите внести изменения:\n ===> ")
+
                         ind = model.get_ind_of_note_with_id(int(id_to_modify)) 
-                        # print(ind)
                         if ind == global_data.FAIL : 
                             view.out(global_data.NO_SUCH_NOTE)
                         else : 
                             view.out(global_data.FOUND_NOTE)
                             view.print_note(model.note_for_print(global_data.int_db_structure[ind]))
-
                             user_choice = view.string_input(global_data.EDIT_OPTIONS)
 
                             if user_choice == global_data.CHANGE_HEADER: 
                                 new_header = view.string_input("Введите новый заголовок:\n ===> ")
                                 if new_header != "" : 
-                                    # ind = model.get_ind_of_note_with_id(int(id_to_modify))
                                     global_data.int_db_structure[ind][1] = new_header
                                     view.out(f"\nЗаголовок заметки c ID = {id_to_modify} изменен: \n")
-                                    # view.out(f"\nИндекс = {ind}\n")
                                     view.print_note(model.note_for_print(global_data.int_db_structure[ind]))
                                 else: 
                                     view.out(global_data.EMPTY_STRING_IS_INPUT)
@@ -180,7 +154,7 @@ def run() :
                         if ind == global_data.FAIL : 
                             view.out(global_data.NOTE_WITH_SUCH_ID_IS_ABSENT)
                         else : 
-                            view.out(f"Заметка с ID = {id_to_delete}:\n")
+                            view.out(f"ЗАМЕТКА С ID = {id_to_delete}:\n")
                             view.print_note(model.note_for_print(model.remove_note_with_id(int(id_to_delete))[1]))
                             view.out("УСПЕШНО УДАЛЕНА")
                     else : 
@@ -222,10 +196,6 @@ def run() :
                         else : 
                             global_data.data_base_name = new_file_name
                             global_data.int_db_structure = list_of_notes 
-                            # ОТЛАДОЧНАЯ ПЕЧАТЬ
-                            print("Вот исходное состояние файла, с которым Вы пожелали работать: \n")
-                            print(global_data.int_db_structure)
-                            # ОТЛАДОЧНАЯ ПЕЧАТЬ
                             global_data.next_ID = model.get_next_ID(global_data.int_db_structure)
                 
             case global_data.QUIT: 
@@ -234,7 +204,7 @@ def run() :
             case _ : 
                 view.out(global_data.INVALID_COMMAND_TRY_AGAIN)
 
-# Функция запрашивает у пользователя данные для создания заметки: 
+# Функция request_note_data() запрашивает у пользователя данные для создания заметки: 
 # - название
 # - текст
 def request_note_data() : 
